@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharmflow</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=DM+Mono:wght@500&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F1E7; --card:#FFFDF8; --ink:#242018; --sub:#796F5C;
+  --teal:#1F8A82; --teal-d:#156860; --navy:#2C4A66; --navy-d:#1D3347;
+  --plum:#7A4A63; --plum-d:#5C3649; --sky:#4D86A8; --sage:#6B8F5F; --amber:#C77B30;
+  --line:#E6DCC4; --urgent:#C0392B; --urgent-bg:#FBE7E2; --stripe:rgba(31,138,130,.045);
+  padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--paper:#211D17;--card:#2A251D;--ink:#F0EADC;--sub:#B2A890;--line:#3C3527;--urgent-bg:#3E231D;--stripe:rgba(255,255,255,.03);}
+}
+:root[data-theme="dark"]{--paper:#211D17;--card:#2A251D;--ink:#F0EADC;--sub:#B2A890;--line:#3C3527;--urgent-bg:#3E231D;--stripe:rgba(255,255,255,.03);}
+*{box-sizing:border-box;}
+body{margin:0;background:
+  radial-gradient(circle at 10% 15%, rgba(77,134,168,.14), transparent 38%),
+  radial-gradient(circle at 90% 8%, rgba(107,143,95,.13), transparent 36%),
+  radial-gradient(circle at 85% 85%, rgba(122,74,99,.13), transparent 42%),
+  radial-gradient(circle at 10% 88%, rgba(31,138,130,.15), transparent 42%),
+  radial-gradient(circle at 50% 50%, rgba(199,123,48,.06), transparent 60%),
+  var(--paper);
+  background-attachment:fixed;color:var(--ink);font-family:'Inter',system-ui,sans-serif;padding:22px;}
+.wrap{max-width:1220px;margin:0 auto;}
+.appbar{background:linear-gradient(120deg,var(--navy),var(--teal-d));color:#fff;border-radius:18px;padding:22px 26px;margin-bottom:22px;box-shadow:0 8px 20px rgba(44,74,102,.25);display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.mascot-badge{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.3);border-radius:16px;width:62px;height:62px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,.15);}
+.mascot-badge svg{width:42px;height:42px;shape-rendering:crispEdges;}
+.appbar h1{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;margin:0 0 5px;letter-spacing:.01em;}
+.appbar .sub{color:rgba(255,255,255,.85);font-size:.88rem;margin:0;}
+.topgrid{display:grid;grid-template-columns:2.1fr 1fr;gap:18px;margin-bottom:18px;}
+@media(max-width:760px){.topgrid{grid-template-columns:1fr;}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 3px 12px rgba(36,32,24,.06);}
+.dash{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+@media(max-width:640px){.dash{grid-template-columns:repeat(2,1fr);}}
+.stat{border-radius:16px;padding:16px 12px;text-align:center;color:#fff;position:relative;cursor:default;}
+.stat-panel{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--card);border-radius:14px;box-shadow:0 16px 34px rgba(0,0,0,.28);z-index:30;width:250px;max-height:280px;overflow:auto;text-align:left;padding:0;border-top:4px solid var(--teal);}
+.stat:hover .stat-panel{display:block;}
+.stat-panel-head{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.82rem;color:var(--ink);padding:12px 14px 10px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;}
+.stat-panel-body{padding:6px;}
+.stat-panel-item{padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--ink);border-bottom:1px solid var(--line);transition:background .12s ease;}
+.stat-panel-item:last-child{border-bottom:none;}
+.stat-panel-item:hover{background:var(--paper);}
+.stat-panel-item b{font-size:.84rem;font-weight:600;font-family:'Space Grotesk',sans-serif;}
+.stat-panel-empty{padding:16px 14px;color:var(--sub);font-size:.82rem;text-align:center;}
+.stat .ic{font-size:1.2rem;display:block;margin-bottom:4px;}
+.stat b{display:block;font-family:'Space Grotesk',sans-serif;font-size:1.7rem;line-height:1.2;}
+.stat span{font-size:.72rem;opacity:.92;letter-spacing:.02em;}
+h2{font-family:'Space Grotesk',sans-serif;font-size:1.08rem;margin:0 0 12px;color:var(--navy-d);display:flex;align-items:center;gap:8px;}
+@media (prefers-color-scheme:dark){h2{color:var(--ink);}}
+:root[data-theme="dark"] h2{color:var(--ink);}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+th,td{padding:11px 12px;text-align:left;font-size:.88rem;border-bottom:1px solid var(--line);word-wrap:break-word;}
+th{color:var(--sub);font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;font-family:'DM Mono',monospace;}
+tbody tr:hover{background:color-mix(in srgb, var(--teal) 6%, transparent);}
+@keyframes flashRow{0%{background:rgba(31,138,130,.4);}100%{background:transparent;}}
+.flash-highlight td{animation:flashRow 1.5s ease;}
+.flash-highlight.row-urgent td{animation:none;box-shadow:0 0 0 3px var(--urgent) inset;}
+.hist-row.flash-highlight{animation:flashRow 1.5s ease;}
+
+/* Today's Work - compact pill grid */
+.today-grid{display:flex;flex-wrap:wrap;gap:10px;}
+.today-pill{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer;font-size:.84rem;display:flex;align-items:center;gap:9px;transition:transform .12s ease,border-color .12s ease;}
+.today-pill:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:0 4px 10px rgba(0,0,0,.08);}
+.tp-time{font-family:'DM Mono',monospace;color:var(--sub);font-size:.76rem;}
+.tp-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.tp-task{font-weight:600;}
+
+/* Urgent tasks block */
+.urgent-block{border:2px solid var(--urgent);border-radius:16px;overflow:hidden;margin-bottom:18px;box-shadow:0 4px 16px rgba(192,57,43,.14);}
+.urgent-block-head{background:var(--urgent);color:#fff;padding:13px 20px;font-family:'Space Grotesk',sans-serif;font-weight:700;display:flex;align-items:center;gap:8px;}
+.urgent-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:pulseDot 1.4s infinite;}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.urgent-block-body{background:var(--card);padding:6px 10px;}
+.urgent-row-item{display:flex;justify-content:space-between;align-items:center;padding:10px 10px;border-bottom:1px solid var(--line);cursor:pointer;gap:10px;}
+.urgent-row-item:last-child{border-bottom:none;}
+.urgent-row-item:hover{background:var(--urgent-bg);}
+.urgent-row-item .urn{font-weight:700;}
+.urgent-row-item .urp{font-size:.76rem;color:var(--sub);white-space:nowrap;}
+
+/* Pharmacy folder-tab cards */
+.pharm{margin-bottom:26px;}
+.pharm-outer{border-radius:20px;border:1px solid var(--line);box-shadow:0 4px 16px rgba(36,32,24,.09);overflow:visible;}
+.pharm-head{padding:16px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;border-radius:20px 20px 0 0;position:relative;}
+.pharm-body{background:var(--card);padding:8px 20px 20px;border-radius:0 0 20px 20px;}
+.actions{white-space:nowrap;}
+.icon-btn{background:var(--paper);border:1px solid var(--line);border-radius:8px;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.88rem;margin-right:6px;transition:transform .12s ease,background .15s ease,border-color .15s ease;line-height:1;}
+.icon-btn:last-child{margin-right:0;}
+.icon-btn:hover{transform:translateY(-1px) scale(1.05);border-color:var(--teal);background:color-mix(in srgb, var(--teal) 15%, var(--paper));}
+.icon-btn.danger:hover{border-color:var(--urgent);background:color-mix(in srgb, var(--urgent) 15%, var(--paper));}
+.pharm-head .icon-btn{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);color:#fff;}
+.pharm-head .icon-btn:hover{background:rgba(255,255,255,.35);}
+.pharm-menu-wrap{position:relative;display:inline-block;}
+.pharm-menu-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.22);z-index:25;min-width:220px;padding:6px;text-align:left;}
+.pharm-menu-panel.show{display:block;}
+.pharm-menu-item{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.86rem;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.pharm-menu-item:hover{background:var(--paper);}
+.pharm-menu-item.danger{color:var(--urgent);}
+
+/* row status */
+.row-active td{background:rgba(31,138,130,.04);}
+.row-done td{background:var(--paper);opacity:.6;}
+.row-done .task-name{text-decoration:line-through;}
+.row-urgent td{background:var(--urgent-bg)!important;box-shadow:inset 4px 0 0 var(--urgent);}
+.status-pill{display:inline-block;font-size:.64rem;padding:2px 8px;border-radius:20px;margin-left:8px;font-weight:700;letter-spacing:.02em;vertical-align:middle;white-space:nowrap;}
+.active-pill{background:rgba(31,138,130,.14);color:var(--teal-d);}
+.done-pill{background:rgba(0,0,0,.08);color:var(--sub);}
+.urgent-pill{background:var(--urgent);color:#fff;transform:rotate(-2deg);display:inline-block;}
+
+.note-link{color:var(--teal-d);cursor:pointer;font-weight:600;position:relative;white-space:nowrap;}
+.note-link .tip{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--navy-d);color:#fff;padding:12px 14px;border-radius:10px;font-size:.82rem;width:250px;white-space:pre-line;z-index:15;line-height:1.6;box-shadow:0 10px 24px rgba(0,0,0,.25);text-align:left;font-weight:400;}
+.note-link:hover .tip{display:block;}
+.hover-info{position:relative;cursor:default;border-bottom:1px dotted var(--sub);}
+.task-link{color:var(--teal-d);text-decoration:none;font-weight:600;border-bottom:1px solid var(--teal-d);cursor:pointer;}
+.task-link:hover{color:var(--navy);}
+.hover-info .tip{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--navy-d);color:#fff;padding:13px 15px;border-radius:10px;font-size:.82rem;width:270px;white-space:pre-line;z-index:15;line-height:1.65;box-shadow:0 10px 24px rgba(0,0,0,.25);}
+.hover-info:hover .tip{display:block;}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);}50%{box-shadow:0 0 0 10px rgba(192,57,43,0);}}
+.modal.alert-modal{border:3px solid var(--urgent);animation:pulseBorder 1.4s infinite;}
+.hist-row{padding:14px 16px;margin-bottom:10px;border-radius:12px;border-left:5px solid var(--teal);background:color-mix(in srgb, var(--teal) 7%, var(--card));}
+.hist-row:last-child{margin-bottom:0;}
+.hname{font-weight:600;cursor:default;display:inline-block;border-bottom:1px dotted var(--sub);}
+.hist-badge{display:inline-block;background:var(--sage);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.02em;padding:3px 9px;border-radius:20px;margin-top:6px;}
+button.primary{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-weight:600;cursor:pointer;font-size:.9rem;}
+button.ghost{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer;font-size:.86rem;color:var(--ink);font-weight:500;}
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.modal-bg{position:fixed;inset:0;background:rgba(36,32,24,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card);border-radius:18px;padding:24px;width:100%;max-width:440px;max-height:90vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.modal.danger{border-top:6px solid var(--urgent);}
+.modal h3{font-family:'Space Grotesk',sans-serif;margin:0 0 14px;}
+label{display:block;font-size:.8rem;color:var(--sub);margin:12px 0 5px;font-weight:600;}
+input,select,textarea{width:100%;padding:10px 11px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-family:inherit;font-size:.9rem;}
+textarea{min-height:70px;}
+.chk{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+.empty{color:var(--sub);font-size:.85rem;padding:10px 0;}
+.dropdown-wrap{position:relative;}
+.dropdown-toggle{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;}
+.dropdown-panel{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.18);padding:12px;z-index:25;max-height:300px;overflow:auto;}
+.dropdown-panel.show{display:block;}
+.dropdown-item{display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:7px;cursor:pointer;font-size:.88rem;}
+.dropdown-item:hover{background:var(--paper);}
+.dropdown-item input{width:auto;}
+.stat.clickable{cursor:pointer;}
+.stat.active-mode{outline:3px solid #fff;outline-offset:-3px;box-shadow:0 0 0 4px rgba(199,123,48,.4);}
+
+/* ===== Retro office skin ===== */
+:root{--desk:#176B64;--chrome:#E7DEC6;--edge:#1B1A1F;--hi:#FFFDF4;--lo:#B8AB8A;--drawer:#C9B585;--drawer-d:#A8935F;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--desk:#0F3F3B;--chrome:#3A3427;--edge:#0B0A07;--hi:#4B4433;--lo:#1D1A13;--drawer:#5A4B30;--drawer-d:#43371F;}}
+:root[data-theme="dark"]{--desk:#0F3F3B;--chrome:#3A3427;--edge:#0B0A07;--hi:#4B4433;--lo:#1D1A13;--drawer:#5A4B30;--drawer-d:#43371F;}
+body{background-color:var(--desk);background-image:linear-gradient(45deg,rgba(255,255,255,.045) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.045) 75%),linear-gradient(45deg,rgba(255,255,255,.045) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.045) 75%);background-size:4px 4px;background-position:0 0,2px 2px;background-attachment:scroll;padding:22px 22px 140px;}
+.card{border:2px solid var(--edge);border-radius:3px;box-shadow:inset 0 0 0 1px var(--hi),5px 5px 0 rgba(0,0,0,.32);padding:0;}
+.card>:not(h2){margin-left:18px;margin-right:18px;}
+.card>h2+*{margin-top:16px;}
+.card>:last-child{margin-bottom:18px;}
+.card>h2{margin:0;padding:6px 12px 6px 34px;position:relative;min-height:30px;font-family:'Silkscreen',monospace;font-weight:400;font-size:.74rem;letter-spacing:.05em;color:#F6F1E7!important;background:repeating-linear-gradient(0deg,var(--navy) 0 2px,var(--navy-d) 2px 3px);border-bottom:2px solid var(--edge);}
+.card>h2::before{content:"";position:absolute;left:10px;top:50%;width:13px;height:13px;margin-top:-7px;border:2px solid #F6F1E7;background:var(--navy-d);}
+.card>h2 span{color:inherit!important;opacity:.8;}
+.card>.menubar,.card>.desk,.card>.az,.card>.folders{margin:0;}
+.menubar{display:flex;flex-wrap:wrap;gap:2px;background:var(--chrome);border-bottom:2px solid var(--edge);padding:3px 6px;position:relative;z-index:30;}
+.mb{position:relative;}
+.mb-btn{background:none;border:0;font:500 .82rem 'Space Grotesk',sans-serif;padding:4px 10px;cursor:pointer;color:var(--ink);border-radius:2px;}
+.mb-btn:hover,.mb-btn.on{background:var(--navy);color:#F6F1E7;}
+.mb-panel{display:none;position:absolute;top:100%;left:0;min-width:230px;background:var(--chrome);border:2px solid var(--edge);box-shadow:4px 4px 0 rgba(0,0,0,.35);padding:3px;z-index:60;}
+.mb-panel.show{display:block;}
+.mb-item{padding:6px 12px;font-size:.84rem;cursor:pointer;color:var(--ink);white-space:nowrap;}
+.mb-item:hover{background:var(--navy);color:#F6F1E7;}
+.mb-item.danger{color:var(--urgent);}
+.mb-item.danger:hover{background:var(--urgent);color:#fff;}
+.mb-sep{height:2px;background:var(--lo);margin:3px 2px;}
+.desk{background-color:var(--desk);background-image:linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.05) 75%),linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.05) 75%);background-size:4px 4px;background-position:0 0,2px 2px;padding:14px 18px 26px;position:relative;min-height:190px;}
+.tagline{margin:0 0 16px;color:rgba(246,241,231,.9);font-size:.82rem;}
+.dash{display:flex;flex-wrap:wrap;gap:10px 20px;}
+.stat{position:relative;width:96px;text-align:center;cursor:default;color:#F6F1E7;background:none!important;padding:0;border-radius:0;}
+.stat .ico{position:relative;display:inline-block;padding:8px;line-height:0;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35));}
+.stat .cnt{position:absolute;top:-2px;right:-8px;line-height:1;font:700 .78rem 'DM Mono',monospace;font-style:normal;background:var(--chrome);color:var(--ink);border:2px solid var(--edge);padding:2px 5px;min-width:22px;}
+.stat .lbl{display:block;font-size:.72rem;line-height:1.25;padding:2px 4px;margin-top:2px;opacity:1;}
+.stat:hover .lbl,.stat.active-mode .lbl{background:var(--navy);}
+.stat.active-mode{outline:none;box-shadow:none;}
+.stat-panel{border-radius:2px;border:2px solid var(--edge);border-top-width:4px;box-shadow:5px 5px 0 rgba(0,0,0,.35);}
+.urgent-block{border-radius:3px;border:2px solid var(--edge);box-shadow:5px 5px 0 rgba(0,0,0,.32);}
+.urgent-block-head{font-family:'Silkscreen',monospace;font-weight:400;font-size:.76rem;letter-spacing:.05em;background:repeating-linear-gradient(0deg,var(--urgent) 0 2px,#9E2D21 2px 3px);border-bottom:2px solid var(--edge);}
+.peek{margin-left:auto;line-height:0;}
+.modal{border:2px solid var(--edge);border-radius:3px;box-shadow:6px 6px 0 rgba(0,0,0,.4);}
+button.primary,button.ghost,.tb-btn{border:2px solid var(--edge);border-radius:3px;box-shadow:inset 1px 1px 0 rgba(255,255,255,.35),2px 2px 0 rgba(0,0,0,.4);}
+button.ghost{background:var(--chrome);}
+button.primary:active,button.ghost:active,.tb-btn:active{transform:translate(1px,1px);box-shadow:none;}
+.icon-btn{border-radius:3px;border:2px solid var(--edge);}
+input,select,textarea{border-radius:2px;border:2px solid var(--edge);box-shadow:inset 1px 1px 0 rgba(0,0,0,.15);}
+.today-pill{border-radius:3px;border:2px solid var(--edge);box-shadow:2px 2px 0 rgba(0,0,0,.3);}
+/* file drawer + folders */
+.az{display:flex;flex-wrap:wrap;gap:3px;padding:12px 14px 0;background:var(--drawer-d);border-bottom:3px solid var(--edge);}
+.az-tab{font:700 .78rem 'Space Grotesk',sans-serif;width:28px;height:30px;padding:0;border:2px solid var(--edge);border-bottom:none;border-radius:6px 6px 0 0;background:var(--lo);color:var(--ink);opacity:.4;cursor:default;}
+.az-tab.has{background:#F1E4B6;color:#242018;opacity:1;cursor:pointer;transition:transform .12s ease;}
+.az-tab.has:hover{transform:translateY(-3px);}
+.az-tab.on{background:var(--amber);color:#fff;transform:translateY(-4px);}
+.drawer-ctl{margin-top:16px;margin-bottom:16px;}
+.folders{background:linear-gradient(var(--drawer),var(--drawer-d));padding:6px 20px 24px;}
+.folders>.empty-cat{padding:20px 0;color:#242018;}
+.folder{position:relative;margin:34px 0 0;}
+.folder-tab{position:absolute;left:var(--tl);top:-26px;height:28px;z-index:1;max-width:calc(100% - var(--tl) - 12px);display:flex;align-items:center;padding:0 14px;background:var(--fc);color:#fff;border:2px solid var(--edge);border-bottom:none;border-radius:9px 9px 0 0;font:700 .84rem 'Space Grotesk',sans-serif;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.folder-front{border:2px solid var(--edge);background:var(--card);box-shadow:4px 4px 0 rgba(0,0,0,.3);border-radius:0 6px 6px 6px;}
+.folder-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 14px;background:var(--fc);color:#fff;cursor:pointer;font-size:.82rem;font-weight:600;}
+.folder-head .caret{font-style:normal;margin-right:4px;}
+.fh-meta{display:flex;align-items:center;gap:10px;}
+.fh-urg{background:var(--urgent);padding:1px 8px;border-radius:10px;font-size:.7rem;border:1px solid rgba(255,255,255,.6);}
+.folder-head .icon-btn{background:rgba(255,255,255,.2);border-color:var(--edge);color:#fff;margin-right:0;}
+.folder-body{display:none;padding:6px 18px 16px;}
+.folder.open .folder-body{display:block;}
+.folder:not(.open) .folder-front{border-radius:0 6px 6px 6px;}
+.empty-cat{display:flex;align-items:center;gap:12px;color:var(--sub);font-size:.85rem;padding:6px 0;line-height:0;}
+.empty-cat span{line-height:1.4;}
+.empty-cat svg{flex-shrink:0;}
+/* taskbar + cat */
+.taskbar{position:fixed;left:0;right:0;bottom:0;min-height:40px;display:flex;align-items:center;gap:8px;padding:0 12px 0 10px;padding-bottom:env(safe-area-inset-bottom,0px);background:var(--chrome);border-top:2px solid var(--edge);box-shadow:inset 0 2px 0 var(--hi);z-index:35;}
+.tb-btn{font:600 .8rem 'Inter',sans-serif;padding:5px 12px;background:var(--chrome);color:var(--ink);cursor:pointer;}
+.tb-btn.primary{background:var(--teal);color:#fff;}
+#tbStatus{flex:1;font-size:.78rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px;}
+#tbClock{font:500 .72rem 'DM Mono',monospace;border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);padding:4px 8px;white-space:nowrap;color:var(--ink);}
+@media(max-width:640px){#tbClock{display:none;}.stat{width:84px;}}
+#deskCat{position:fixed;right:20px;bottom:calc(40px + env(safe-area-inset-bottom,0px));z-index:34;line-height:0;cursor:pointer;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.3));}
+#deskCat svg{display:block;}
+#deskCat.hop svg{animation:hop .5s ease 2;}
+@keyframes hop{0%,100%{transform:translateY(0);}45%{transform:translateY(-12px);}}
+.cat-say{position:absolute;right:0;bottom:calc(100% + 8px);width:max-content;max-width:220px;line-height:1.35;font:500 .78rem 'Inter',sans-serif;background:var(--card);color:var(--ink);border:2px solid var(--edge);box-shadow:3px 3px 0 rgba(0,0,0,.3);padding:6px 9px;display:none;}
+.cat-say.show{display:block;}
+.zzz{position:absolute;left:34px;top:-4px;font:700 .8rem 'Silkscreen',monospace;color:#F6F1E7;text-shadow:1px 1px 0 var(--edge);line-height:1;opacity:0;animation:zz 2.6s ease-in-out infinite;}
+@keyframes zz{0%{opacity:0;transform:translate(0,6px);}30%{opacity:1;}100%{opacity:0;transform:translate(10px,-14px);}}
+@media (prefers-reduced-motion:reduce){#deskCat.hop svg,.zzz,.urgent-dot{animation:none;}.zzz{opacity:1;}}
+
+/* ===== table fit + notepad ===== */
+.actions{white-space:nowrap;padding-left:8px;padding-right:8px;}
+.icon-btn{width:28px;height:28px;margin-right:5px;}
+.note-btn{font:700 .74rem 'Space Grotesk',sans-serif;padding:3px 10px;border:2px solid var(--edge);border-radius:3px;background:var(--chrome);color:var(--ink);cursor:pointer;box-shadow:1px 1px 0 rgba(0,0,0,.4);}
+.note-btn b{background:var(--navy);color:#F6F1E7;padding:0 6px;margin-left:4px;border-radius:2px;}
+.note-chip{margin-left:8px;font:700 .66rem 'Space Grotesk',sans-serif;border:2px solid var(--edge);background:#F1E4B6;color:#242018;padding:1px 6px;cursor:pointer;vertical-align:middle;border-radius:2px;}
+body.np-open #deskCat{display:none;}
+#noteModalBg{z-index:18;padding-bottom:56px;}
+.modal.wide{max-width:940px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 110px);}
+.np-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px 6px 34px;position:relative;flex-shrink:0;font:400 .74rem 'Silkscreen',monospace;letter-spacing:.05em;color:#F6F1E7;background:repeating-linear-gradient(0deg,var(--navy) 0 2px,var(--navy-d) 2px 3px);border-bottom:2px solid var(--edge);}
+.np-bar::before{content:"";position:absolute;left:10px;top:50%;width:13px;height:13px;margin-top:-7px;border:2px solid #F6F1E7;background:var(--navy-d);}
+.np-bar .ghost{padding:4px 12px;font-size:.78rem;}
+.np-body{display:grid;grid-template-columns:230px 1fr;min-height:0;flex:1;overflow:hidden;}
+.np-list{border-right:2px solid var(--edge);background:var(--paper);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:8px;}
+.np-list>div{display:flex;flex-direction:column;gap:8px;}
+.np-item{border:2px solid var(--edge);background:var(--card);padding:8px 10px;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.25);}
+.np-item b{display:block;font:700 .84rem 'Space Grotesk',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.np-item span{display:block;font-size:.76rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.np-item i{font:normal .7rem 'DM Mono',monospace;color:var(--sub);}
+.np-item.on{background:#F1E4B6;color:#242018;}
+.np-item.on span,.np-item.on i{color:#5A4F38;}
+.np-main{padding:14px 18px 20px;overflow:auto;position:relative;}
+.np-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+.np-main .np-note-title{margin:0;font:700 1.15rem 'Space Grotesk',sans-serif;}
+.np-title-in{flex:1;min-width:160px;font:700 1.05rem 'Space Grotesk',sans-serif;}
+.np-actions{display:flex;gap:8px;}
+.np-meta{font-size:.74rem;color:var(--sub);margin:4px 0 8px;}
+.np-tools{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 8px;padding:6px;background:var(--chrome);border:2px solid var(--edge);}
+.np-tools button{font:700 .8rem 'Space Grotesk',sans-serif;min-width:30px;height:28px;padding:0 8px;border:2px solid var(--edge);background:var(--card);color:var(--ink);cursor:pointer;border-radius:3px;}
+.np-tools button:hover{background:var(--navy);color:#F6F1E7;}
+.tbw{position:relative;display:inline-block;}
+.pop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:70;background:var(--chrome);border:2px solid var(--edge);box-shadow:4px 4px 0 rgba(0,0,0,.35);padding:6px;min-width:150px;}
+.pop.show{display:block;}
+.pop .pi{display:block;width:100%;text-align:left;margin:0 0 3px;font:600 .8rem 'Inter',sans-serif;height:auto;padding:5px 8px;border:2px solid var(--edge);background:var(--card);color:var(--ink);cursor:pointer;}
+.pop .pi:hover{background:var(--navy);color:#F6F1E7;}
+.pop .sw{width:24px;height:24px;min-width:24px;padding:0;margin:2px;display:inline-block;border:2px solid var(--edge);cursor:pointer;}
+.pop-list{max-height:220px;overflow:auto;min-width:270px;}
+.np-editor{min-height:210px;border:2px solid var(--line);background:var(--card);padding:12px 14px;font-size:1rem;line-height:1.6;outline:none;overflow-wrap:anywhere;}
+.np-editing .np-editor{border-color:var(--edge);box-shadow:inset 0 0 0 2px var(--teal);}
+.np-editor span[style*="background-color: rgb"]{color:#242018;}
+.tasklink{border-bottom:2px solid var(--teal);background:color-mix(in srgb,var(--teal) 14%,transparent);cursor:pointer;border-radius:2px;}
+.tasklink::after{content:" ↗";font-size:.72em;color:var(--teal-d);}
+.tasklink.dead{border-bottom-style:dashed;opacity:.6;text-decoration:line-through;}
+.np-editing .tasklink{cursor:text;}
+.np-main h4{margin:16px 0 8px;font:700 .82rem 'Space Grotesk',sans-serif;color:var(--sub);}
+.chip{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--edge);background:#F1E4B6;color:#242018;padding:2px 8px;font-size:.78rem;font-weight:600;cursor:pointer;margin:0 6px 6px 0;border-radius:2px;}
+.chip.dead{opacity:.55;text-decoration:line-through;}
+.cmt{border-left:4px solid var(--teal);background:color-mix(in srgb,var(--teal) 7%,var(--card));padding:8px 12px;margin-bottom:8px;}
+.cmt-top{display:flex;justify-content:space-between;align-items:center;font:500 .72rem 'DM Mono',monospace;color:var(--sub);}
+.cmt-top .icon-btn{width:24px;height:24px;margin:0;font-size:.74rem;}
+.cmt-tx{white-space:pre-wrap;margin-top:4px;font-size:.9rem;}
+@media(max-width:700px){.np-body{grid-template-columns:1fr;overflow:auto;}.np-list{border-right:none;border-bottom:2px solid var(--edge);max-height:190px;}}
+
+/* ===== fit fix + link picker ===== */
+.card>table,.card>button{width:calc(100% - 36px)!important;}
+.np-hint{font-size:.78rem;color:var(--sub);margin:0 0 8px;line-height:1.45;}
+.pk-h{font-size:.8rem;line-height:1.4;margin:0 0 6px;max-width:300px;color:var(--ink);}
+.pk-s{margin:0 0 6px;}
+.pk-items{max-height:210px;overflow:auto;}
+.pg{font:700 .74rem 'Space Grotesk',sans-serif;color:var(--sub);margin:6px 0 3px;}
+.pop-list{min-width:300px;max-height:none;overflow:visible;}
+.np-att .pop{top:auto;bottom:calc(100% + 4px);}
+
+/* ===== deadlines + timers ===== */
+.dcd{display:inline-block;margin-top:3px;font:700 .64rem 'DM Mono',monospace;padding:1px 5px;border:2px solid var(--edge);border-radius:2px;background:var(--card);color:var(--ink);white-space:nowrap;}
+.dcd.soon{background:#F1D9A0;color:#242018;}
+.dcd.over{background:var(--urgent);color:#fff;}
+.tmeta{font-size:.74rem;color:var(--sub);margin-top:4px;line-height:1.5;}
+.tmr{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.tmr-t{font:700 .76rem 'DM Mono',monospace;border:2px solid var(--edge);padding:1px 7px;background:var(--card);border-radius:2px;}
+.tmr.run .tmr-t{background:var(--teal);color:#fff;}
+.tmr.fin .tmr-t{background:var(--urgent);color:#fff;}
+.tmr.fin:not(:has(.tmr-t)){font:700 .74rem 'DM Mono',monospace;color:var(--sub);}
+.tmr-b{font:700 .7rem 'Space Grotesk',sans-serif;padding:2px 8px;border:2px solid var(--edge);border-radius:3px;background:var(--chrome);color:var(--ink);cursor:pointer;box-shadow:1px 1px 0 rgba(0,0,0,.4);}
+.tmr .pharm-menu-panel{left:0;right:auto;min-width:210px;}
+.qd{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.qd button{padding:3px 10px;font-size:.74rem;}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="topgrid">
+  <div class="card office">
+    <h2>✚ Pharmflow Office <span id="dashBadge" style="font-weight:500;font-size:.78rem"></span></h2>
+    <div class="menubar">
+      <div class="mb"><button class="mb-btn" onclick="toggleMB(this,event)">Action</button><div class="mb-panel">
+        <div class="mb-item" onclick="openTask()">Add task…</div>
+        <div class="mb-item" onclick="openAddPharmacy()">Add pharmacy…</div>
+        <div class="mb-sep"></div>
+        <div class="mb-item" onclick="openNotes('general')">Notepad (general notes)…</div>
+        <div class="mb-item" onclick="openActivityLog()">Activity log</div>
+        <div class="mb-item" onclick="openHistory()">Things history</div></div></div>
+      <div class="mb"><button class="mb-btn" onclick="toggleMB(this,event)">View</button><div class="mb-panel">
+        <div class="mb-item" onclick="toggleActiveOnlyView()">Unfinished tasks only (on/off)</div>
+        <div class="mb-item" onclick="clearPharmFilter()">Show all pharmacies</div>
+        <div class="mb-sep"></div>
+        <div class="mb-item" onclick="setAllFolders(true)">Open all folders</div>
+        <div class="mb-item" onclick="setAllFolders(false)">Close all folders</div></div></div>
+      <div class="mb"><button class="mb-btn" onclick="toggleMB(this,event)">Cat</button><div class="mb-panel">
+        <div class="mb-item" onclick="catPet()">Pet the cat</div>
+        <div class="mb-item" onclick="catNap()">Nap / wake</div>
+        <div class="mb-item" onclick="catMute()">Mute / unmute meows</div></div></div>
+      <div class="mb"><button class="mb-btn" onclick="toggleMB(this,event)">Settings</button><div class="mb-panel">
+        <div class="mb-item danger" onclick="document.getElementById('resetModalBg').classList.add('show')">Reset all data…</div></div></div>
+      <div class="mb"><button class="mb-btn" onclick="toggleMB(this,event)">Help</button><div class="mb-panel">
+        <div class="mb-item" onclick="showHelp()">How the file drawer works</div></div></div>
+    </div>
+    <div class="desk"><p class="tagline">Every pharmacy, every task, every deadline: one calm place to keep it all straight.</p><div class="dash" id="dash"></div></div>
+  </div>
+  <div class="card">
+    <h2 style="justify-content:space-between">Things <button class="ghost" style="padding:5px 10px;font-size:.75rem" onclick="openHistory()">History</button></h2>
+    <table><thead><tr><th>Task</th><th style="width:76px">Manage</th></tr></thead><tbody id="thingsBody"></tbody></table>
+    <button class="ghost" style="margin-top:8px;width:100%" onclick="openThing()">+ Add random task</button>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:18px;">
+  <h2>Today's Work <span id="todayBadge" style="font-weight:500;font-size:.78rem;color:var(--sub)"></span></h2>
+  <div class="today-grid" id="todayBody"></div>
+</div>
+
+<div id="urgentSection"></div>
+
+<div class="card drawer" style="margin-bottom:18px;">
+  <h2>File drawer: Pharmacies</h2>
+  <div class="az" id="azIndex"></div>
+  <div class="drawer-ctl">
+  <div class="dropdown-wrap" id="filterDropdownWrap">
+    <button type="button" class="ghost dropdown-toggle" onclick="toggleFilterDropdown(event)" id="filterToggleBtn">Select pharmacies ▾</button>
+    <div class="dropdown-panel" id="filterDropdownPanel">
+      <input id="pharmSearch" placeholder="Search pharmacy name..." oninput="renderPharmFilterList()">
+      <div id="pharmFilterList" style="margin-top:8px;"></div>
+    </div>
+  </div>
+  <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.85rem;cursor:pointer;color:var(--ink);">
+    <input type="checkbox" id="activeOnlyCheckbox" onchange="toggleActiveOnlyView()" style="width:auto;">
+    ⏳ Only show active (unfinished) tasks
+  </label>
+  <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <span id="filterStatus" style="font-size:.8rem;color:var(--sub)"></span>
+    <span style="display:flex;gap:8px;">
+      <button class="ghost" onclick="openAddPharmacy()">+ Add pharmacy</button>
+      <button class="ghost" onclick="clearPharmFilter()">Show all</button>
+    </span>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="setAllFolders(true)">Open all folders</button><button class="ghost" onclick="setAllFolders(false)">Close all folders</button></div>
+</div>
+
+<!-- Add Pharmacy only -->
+<div class="modal-bg" id="addPharmModalBg"><div class="modal">
+  <h3>Add Pharmacy</h3>
+  <label>Pharmacy name</label>
+  <input id="addPharmName" placeholder="e.g. MedPlus Alabang">
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('addPharmModalBg')">Cancel</button>
+    <button class="primary" onclick="saveAddPharmacy()">Add pharmacy</button>
+  </div>
+</div></div>
+
+
+<!-- Activity Log -->
+<div class="modal-bg" id="activityModalBg"><div class="modal">
+  <h3 id="activityTitle" style="color:var(--teal-d)">📜 Activity Log</h3>
+  <div id="activityList" style="max-height:55vh;overflow:auto;margin-top:4px"></div>
+  <div class="modal-actions"><button class="ghost" onclick="closeModal('activityModalBg')">Close</button></div>
+</div></div>
+
+<div id="activeOnlyBanner"></div>
+<div id="pharmList" class="folders"></div>
+</div><!-- /drawer -->
+
+<!-- Reset Confirm -->
+<div class="modal-bg" id="resetModalBg"><div class="modal danger">
+  <h3>⚠ Reset everything?</h3>
+  <p style="color:var(--sub)">This permanently deletes every pharmacy, every task, all notes, your Things list, and your history. This can't be undone.</p>
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('resetModalBg')">Cancel</button>
+    <button class="primary" style="background:var(--urgent)" onclick="closeModal('resetModalBg');resetAll()">Yes, reset everything</button>
+  </div>
+</div></div>
+
+<!-- Rename Pharmacy -->
+<div class="modal-bg" id="renameModalBg"><div class="modal">
+  <h3>Rename pharmacy</h3>
+  <label>Pharmacy name</label>
+  <input id="renameInput">
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('renameModalBg')">Cancel</button>
+    <button class="primary" onclick="saveRename()">Save</button>
+  </div>
+</div></div>
+
+<!-- Notice -->
+<div class="modal-bg" id="noticeModalBg"><div class="modal">
+  <h3 id="noticeTitle">Heads up</h3>
+  <p id="noticeMsg" style="color:var(--sub)"></p>
+  <div class="modal-actions"><button class="primary" onclick="closeModal('noticeModalBg')">OK</button></div>
+</div></div>
+
+<!-- Task Modal -->
+<div class="modal-bg" id="taskModalBg"><div class="modal">
+  <h3 id="taskModalTitle">Add Task</h3>
+  <label>Pharmacy</label>
+  <select id="tPharm" onchange="toggleNewPharm()"></select>
+  <div id="newPharmWrap" style="display:none"><label>New pharmacy name</label><input id="tNewPharm" placeholder="e.g. MedPlus Alabang"></div>
+  <label>Task</label><input id="tName">
+  <label>Deadline (Manila time)</label><input type="datetime-local" id="tDue"><div class="qd"><button type="button" class="ghost" onclick="quickDue('tDue',0)">Today</button><button type="button" class="ghost" onclick="quickDue('tDue',1)">Tomorrow</button><button type="button" class="ghost" onclick="quickDue('tDue',3)">In 3 days</button><button type="button" class="ghost" onclick="quickDue('tDue',7)">Next week</button><button type="button" class="ghost" onclick="quickDue('tDue',null)">Clear</button></div><div class="np-hint" style="margin-top:6px">Quick buttons use 5:00 PM unless you already picked a time. Reminders pop up 3 days before, 1 day before, and on the deadline day.</div>
+  <label>CRM link (optional)</label><input id="tLink" placeholder="https://monday.com/...">
+  <label>Notes (one per line = bullet)</label><textarea id="tNotes"></textarea>
+  <div class="chk"><input type="checkbox" id="tUrgent"><label style="margin:0">Mark urgent</label></div>
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('taskModalBg')">Cancel</button>
+    <button class="primary" onclick="saveTask()">Save task</button>
+  </div>
+</div></div>
+
+<!-- Thing Modal -->
+<div class="modal-bg" id="thingModalBg"><div class="modal">
+  <h3 id="thingModalTitle">Add Random Task</h3>
+  <label>Task</label><input id="thName">
+  <label>Deadline (optional)</label><input type="datetime-local" id="thDue"><div class="qd"><button type="button" class="ghost" onclick="quickDue('thDue',0)">Today</button><button type="button" class="ghost" onclick="quickDue('thDue',1)">Tomorrow</button><button type="button" class="ghost" onclick="quickDue('thDue',3)">In 3 days</button><button type="button" class="ghost" onclick="quickDue('thDue',7)">Next week</button><button type="button" class="ghost" onclick="quickDue('thDue',null)">Clear</button></div>
+  <label>Notes</label><textarea id="thNotes"></textarea>
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('thingModalBg')">Cancel</button>
+    <button class="primary" onclick="saveThing()">Save</button>
+  </div>
+</div></div>
+
+<div id="deskCat" title="Pet the cat" onclick="catPet()"></div>
+<div class="taskbar"><button class="tb-btn primary" onclick="openTask()">+ Add task</button><button class="tb-btn" onclick="openActivityLog()">Activity</button><span id="tbStatus"></span><span id="tbClock"></span></div>
+<div id="globalTip" style="display:none;position:fixed;z-index:50;background:var(--navy-d);color:#fff;padding:13px 15px;border-radius:10px;font-size:.82rem;width:260px;white-space:pre-line;line-height:1.65;box-shadow:0 10px 24px rgba(0,0,0,.3);pointer-events:none;"></div>
+
+<!-- History Modal -->
+<div class="modal-bg" id="historyModalBg"><div class="modal">
+  <h3 style="color:var(--teal-d)">🗂 Things — History</h3>
+  <div id="historyList" style="max-height:50vh;overflow:auto;margin-top:4px"></div>
+  <div class="modal-actions"><button class="ghost" onclick="closeModal('historyModalBg')">Close</button></div>
+</div></div>
+
+<!-- Monday CRM confirm -->
+<div class="modal-bg" id="mondayModalBg"><div class="modal">
+  <h3>📋 Notes on Monday?</h3>
+  <p style="color:var(--sub)">Before this task is marked done — have you already left your notes for it on our CRM (Monday)?</p>
+  <div class="modal-actions">
+    <button class="ghost" onclick="resolveMonday('not_needed')">Not needed</button>
+    <button class="primary" onclick="resolveMonday('yes')">Yes, I left notes</button>
+  </div>
+</div></div>
+
+<!-- Reminder Alert -->
+<div class="modal-bg" id="alertModalBg"><div class="modal alert-modal">
+  <h3 style="color:var(--urgent)">🚨 Task reminder</h3>
+  <div id="alertList" style="max-height:50vh;overflow:auto"></div>
+  <div class="modal-actions"><button class="primary" style="background:var(--urgent)" onclick="closeModal('alertModalBg')">Got it</button></div>
+</div></div>
+
+<!-- Notepad -->
+<div class="modal-bg" id="noteModalBg"><div class="modal wide">
+  <div class="np-bar"><span id="npTitle">Notepad</span><button class="ghost" onclick="closeNotes()">Close</button></div>
+  <div class="np-body">
+    <aside class="np-list"><button class="primary" onclick="newNote()">+ New note</button><div id="npList"></div></aside>
+    <section class="np-main" id="npMain"></section>
+  </div>
+</div></div>
+
+<!-- Confirm Delete -->
+<div class="modal-bg" id="delModalBg"><div class="modal danger">
+  <h3>⚠ Confirm delete</h3>
+  <p id="delMsg" style="color:var(--sub)"></p>
+  <div class="modal-actions">
+    <button class="ghost" onclick="closeModal('delModalBg')">Cancel</button>
+    <button class="primary" style="background:var(--urgent)" onclick="confirmDelete()">Delete</button>
+  </div>
+</div></div>
+
+<script>
+let state = {pharmacies:{}, things:[], nextId:1};
+let activeFilter=new Set();
+let hideCompleted=false;
+let openPharmMenu=null;
+
+function toggleFilterDropdown(evt){
+  if(evt)evt.stopPropagation();
+  document.getElementById('filterDropdownPanel').classList.toggle('show');
+}
+function togglePharmMenu(pid,evt){
+  if(evt)evt.stopPropagation();
+  const panel=document.getElementById('menu-'+pid);
+  const isShowing=panel.classList.contains('show');
+  document.querySelectorAll('.pharm-menu-panel').forEach(p=>p.classList.remove('show'));
+  if(!isShowing)panel.classList.add('show');
+}
+document.addEventListener('click',(e)=>{
+  const wrap=document.getElementById('filterDropdownWrap');
+  if(wrap && !wrap.contains(e.target))document.getElementById('filterDropdownPanel').classList.remove('show');
+  if(!e.target.closest('.pharm-menu-wrap'))document.querySelectorAll('.pharm-menu-panel').forEach(p=>p.classList.remove('show'));
+});
+function renderPharmFilterList(){
+  const q=(document.getElementById('pharmSearch').value||'').toLowerCase();
+  const ids=Object.keys(state.pharmacies).filter(pid=>state.pharmacies[pid].name.toLowerCase().includes(q));
+  const wrap=document.getElementById('pharmFilterList');
+  wrap.innerHTML = ids.length ? ids.map(pid=>{
+    const p=state.pharmacies[pid];
+    const checked=activeFilter.has(pid);
+    return `<label class="dropdown-item"><input type="checkbox" ${checked?'checked':''} onchange="togglePharmFilter('${pid}')"><span style="color:${p.color};font-weight:700">●</span> ${esc(p.name)}</label>`;
+  }).join('') : '<span class="empty">No pharmacies match your search.</span>';
+  updateFilterStatus();renderAZ();
+  const btn=document.getElementById('filterToggleBtn');
+  if(btn)btn.textContent = (activeFilter.size===0?'Select pharmacies':activeFilter.size===1?'1 pharmacy selected':`${activeFilter.size} pharmacies selected`)+' ▾';
+}
+function togglePharmFilter(pid){
+  if(activeFilter.has(pid))activeFilter.delete(pid);else activeFilter.add(pid);
+  renderPharmFilterList();renderDash();renderToday();renderPharmacies();renderUrgent();
+}
+function clearPharmFilter(){
+  activeFilter.clear();
+  document.getElementById('pharmSearch').value='';
+  renderPharmFilterList();renderDash();renderToday();renderPharmacies();renderUrgent();
+}
+function updateFilterStatus(){
+  const el=document.getElementById('filterStatus');
+  const badgeD=document.getElementById('dashBadge');
+  const badgeT=document.getElementById('todayBadge');
+  if(!activeFilter.size){
+    el.textContent='Showing all pharmacies';
+    if(badgeD)badgeD.textContent='';if(badgeT)badgeT.textContent='';
+  } else {
+    const names=[...activeFilter].map(pid=>state.pharmacies[pid]?.name).filter(Boolean);
+    el.textContent=`Showing: ${names.join(', ')}`;
+    const tag=`— filtered (${names.length})`;
+    if(badgeD)badgeD.textContent=tag;if(badgeT)badgeT.textContent=tag;
+  }
+}
+function openAddPharmacy(){
+  document.getElementById('addPharmName').value='';
+  document.getElementById('addPharmModalBg').classList.add('show');
+}
+function saveAddPharmacy(){
+  const name=document.getElementById('addPharmName').value.trim();
+  if(!name)return notice('Please enter a pharmacy name.');
+  const pid='p'+uid();
+  state.pharmacies[pid]={name,tasks:[]};
+  logActivity('Added pharmacy',name);
+  closeModal('addPharmModalBg');
+  render();
+}
+function load(){
+  try{const s=localStorage.getItem('pharmTaskState');if(s)state=JSON.parse(s);}catch(e){}
+}
+function save(){try{localStorage.setItem('pharmTaskState',JSON.stringify(state));}catch(e){}}
+function logActivity(action,pharm,detail){
+  state.activityLog=state.activityLog||[];
+  state.activityLog.unshift({ts:new Date().toISOString(),action,pharm:pharm||'',detail:detail||''});
+  if(state.activityLog.length>500)state.activityLog.length=500;
+}
+function openActivityLog(pharmFilter){
+  const log=(state.activityLog||[]).filter(e=>!pharmFilter||e.pharm===pharmFilter);
+  const list=document.getElementById('activityList');
+  document.getElementById('activityTitle').textContent = pharmFilter ? `📜 Activity Log — ${pharmFilter}` : '📜 Activity Log';
+  list.innerHTML = log.length ? log.map(e=>`
+    <div class="hist-row" style="border-left-color:var(--teal);background:color-mix(in srgb, var(--teal) 6%, var(--card))">
+      <div style="font-weight:600;font-size:.86rem">${esc(e.action)}${e.pharm && !pharmFilter?` — ${esc(e.pharm)}`:''}</div>
+      ${e.detail?`<div style="font-size:.8rem;color:var(--sub);margin-top:2px">${esc(e.detail)}</div>`:''}
+      <div style="font-size:.74rem;color:var(--sub);margin-top:5px;white-space:pre-line">${esc(fmtBoth(e.ts))}</div>
+    </div>`).join('') : '<p class="empty">No activity recorded yet.</p>';
+  document.getElementById('activityModalBg').classList.add('show');
+}
+function uid(){return state.nextId++;}
+function resetAll(){state={pharmacies:{},things:[],nextId:1};save();render();}
+
+const PALETTE=['#1F8A82','#7A4A63','#C77B30','#4D86A8','#B0415B','#6B8F5F','#8A6A2F','#5B5FC7','#B5542A','#2E7D8C','#A4446B','#51713F','#6B4FA0','#9C6B1F'];
+function colorFor(name){let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length];}
+function assignPharmColors(){
+  const ids=Object.keys(state.pharmacies);
+  ids.forEach((pid,i)=>{state.pharmacies[pid].color=PALETTE[i%PALETTE.length];});
+}
+
+function mnlToET(iso){
+  if(!iso)return '—';
+  const d=new Date(iso);
+  return d.toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function todayMNL(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
+function dueDateMNL(iso){if(!iso)return null; return new Date(iso).toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
+function fmtBoth(iso){
+  if(!iso)return '—';
+  const d=new Date(iso);
+  const mnl=d.toLocaleString('en-US',{timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  const et=d.toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  return `MNL ${mnl}\nET ${et}`;
+}
+function taskInfoTip(task){
+  const mondayTxt = !task.done?'Not completed yet':(task.mondayNote==='yes'?'Left ✓':task.mondayNote==='not_needed'?'Not needed':'—');
+  return `ADDED\n${fmtBoth(task.createdAt)}\n\nCOMPLETED\n${task.done?fmtBoth(task.completedAt):'Not yet'}\n\nMONDAY CRM NOTE\n${mondayTxt}`;
+}
+function notesToTip(notes){if(!notes)return '';return notes.split('\n').filter(x=>x.trim()).map(x=>'• '+x).join('\n');}
+
+function render(){
+  noteIdx=buildNoteIndex();assignPharmColors();
+  renderDash();renderThings();renderToday();renderUrgent();renderPharmacies();fillPharmSelect();renderPharmFilterList();renderActiveOnlyBanner();catRefresh();save();
+}
+function renderActiveOnlyBanner(){
+  const cb=document.getElementById('activeOnlyCheckbox');
+  if(cb)cb.checked=hideCompleted;
+  const el=document.getElementById('activeOnlyBanner');
+  if(!el)return;
+  el.innerHTML = hideCompleted ? `<div class="card" style="margin-bottom:14px;border-left:4px solid var(--amber);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <span style="font-size:.85rem;color:var(--sub)">⏳ Showing unfinished tasks only</span>
+    <button class="ghost" onclick="toggleActiveOnlyView()">Show all tasks</button>
+  </div>` : '';
+}
+function toggleActiveOnlyView(){
+  hideCompleted=!hideCompleted;
+  renderDash();renderPharmacies();renderActiveOnlyBanner();
+}
+function panelHTML(list){
+  if(!list.length)return '<div class="stat-panel-empty">Nothing here</div>';
+  return list.map(it=>{
+    const onclick = it.type==='pharm' ? `goToTask('${it.pid}',${it.tid})` : `jumpToHistory(${it.tid})`;
+    return `<div class="stat-panel-item" onclick="event.stopPropagation();${onclick}"><b>${esc(it.label)}</b><br><span style="color:var(--sub);font-size:.72rem">${esc(it.sub||'')}</span></div>`;
+  }).join('');
+}
+function statTile(key,count,label,list,opts){
+  opts=opts||{};
+  const cls=`stat ${opts.clickable?'clickable':''} ${opts.activeMode?'active-mode':''}`;
+  const onclick=opts.onclick?` onclick="${opts.onclick}"`:'';
+  const title=opts.title?` title="${esc(opts.title)}"`:'';
+  return `<div class="${cls}"${onclick}${title}>
+    <div class="ico">${px(ICONS[key],4)}<i class="cnt">${count}</i></div>
+    <span class="lbl">${esc(label)}</span>
+    <div class="stat-panel" style="border-top-color:${ICOL[key]}">
+      <div class="stat-panel-head">${esc(label)} (${count})</div>
+      <div class="stat-panel-body">${panelHTML(list)}</div>
+    </div>
+  </div>`;
+}
+function buildDashData(){
+  const t=todayMNL();
+  const todayList=[],activeList=[],completedTodayList=[],totalList=[],allCompletedList=[];
+  const ids=activeFilter.size?[...activeFilter]:Object.keys(state.pharmacies);
+  for(const pid of ids){
+    const p=state.pharmacies[pid];if(!p)continue;
+    for(const task of p.tasks){
+      const item={type:'pharm',pid,tid:task.id,label:task.name,sub:p.name};
+      totalList.push(item);
+      if(!task.done){
+        activeList.push(item);
+        if(dueDateMNL(task.due)===t)todayList.push(item);
+      } else {
+        if(task.completedAt && dueDateMNL(task.completedAt)===t)completedTodayList.push(item);
+        allCompletedList.push({...item,when:task.completedAt});
+      }
+    }
+  }
+  (state.thingsHistory||[]).forEach(h=>{
+    allCompletedList.push({type:'thing-history',tid:h.id,label:h.name,sub:'Random task',when:h.completedAt});
+  });
+  allCompletedList.sort((a,b)=>new Date(b.when||0)-new Date(a.when||0));
+  return {todayList,activeList,completedTodayList,totalList,allCompletedList};
+}
+function renderDash(){
+  const d=buildDashData();
+  document.getElementById('dash').innerHTML=
+    statTile('today',d.todayList.length,'Today',d.todayList) +
+    statTile('active',d.activeList.length,hideCompleted?'Active ✓':'Active',d.activeList,{clickable:true,activeMode:hideCompleted,onclick:'toggleActiveOnlyView()',title:'Click to show only unfinished tasks in every pharmacy folder'}) +
+    statTile('doneToday',d.completedTodayList.length,'Completed today',d.completedTodayList) +
+    statTile('total',d.totalList.length,'Total tasks',d.totalList) +
+    statTile('done',d.allCompletedList.length,'Completed (all time)',d.allCompletedList) +
+    noteTile();
+}
+function thingInfoTip(t){
+  return `ADDED\n${fmtBoth(t.createdAt)}\n\nDUE\n${t.due?fmtBoth(t.due):'—'}\n\nNOTES\n${notesToTip(t.notes)||'None'}`;
+}
+function renderThings(){
+  const body=document.getElementById('thingsBody');
+  if(!state.things.length){body.innerHTML='<tr><td colspan="2" class="empty">'+emptyCat('No random tasks yet')+'</td></tr>';return;}
+  body.innerHTML=state.things.map(t=>`<tr id="thingrow-${t.id}">
+    <td class="${t.done?'done':''}"><span class="hover-info">${esc(t.name)}<span class="tip">${esc(thingInfoTip(t))}</span></span>${t.due?`<div class="tmeta">Due ${mnlToET(t.due)} ET<br>${dcdHTML(t.due)}</div>`:''}${timerHTML('things',t)}</td>
+    <td class="actions"><span class="pharm-menu-wrap">
+      <button class="icon-btn" title="Options" onclick="togglePharmMenu('th${t.id}',event)">⋮</button>
+      <div class="pharm-menu-panel" id="menu-th${t.id}">
+        <div class="pharm-menu-item" onclick="this.parentElement.classList.remove('show');completeThing(${t.id})">✅ Mark complete</div>
+        <div class="pharm-menu-item" onclick="this.parentElement.classList.remove('show');openThing(${t.id})">✏️ Edit</div>
+        <div class="pharm-menu-item danger" onclick="askDelete('thing',${t.id})">🗑️ Delete</div>
+      </div></span></td></tr>`).join('');
+}
+function renderToday(){
+  const t=todayMNL();const body=document.getElementById('todayBody');
+  let rows=[];
+  const ids=activeFilter.size?[...activeFilter]:Object.keys(state.pharmacies);
+  for(const pid of ids){
+    const p=state.pharmacies[pid];if(!p)continue;
+    for(const task of p.tasks){
+      if(!task.done && dueDateMNL(task.due)===t) rows.push({time:mnlToET(task.due),pharm:p.name,name:task.name,pid,tid:task.id,color:p.color});
+    }
+  }
+  body.innerHTML=rows.length?rows.map(r=>`<div class="today-pill" onclick="goToTask('${r.pid}',${r.tid})">
+    <span class="tp-time">${r.time}</span>
+    <span class="tp-dot" style="background:${r.color}"></span>
+    <span class="tp-task">${esc(r.name)}</span>
+  </div>`).join(''):emptyCat('Nothing due today. The cat approves.');
+}
+function renderUrgent(){
+  const el=document.getElementById('urgentSection');
+  const ids=activeFilter.size?[...activeFilter]:Object.keys(state.pharmacies);
+  let items=[];
+  for(const pid of ids){
+    const p=state.pharmacies[pid];if(!p)continue;
+    for(const task of p.tasks){
+      if(task.urgent && !task.done) items.push({pid,tid:task.id,name:task.name,pharm:p.name,due:task.due});
+    }
+  }
+  if(!items.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="urgent-block">
+    <div class="urgent-block-head"><span class="urgent-dot"></span> Urgent tasks (${items.length})<span class="peek">${catSVG('alert',2,10)}</span></div>
+    <div class="urgent-block-body">${items.map(it=>`
+      <div class="urgent-row-item" onclick="goToTask('${it.pid}',${it.tid})">
+        <span class="urn">${esc(it.name)}</span>
+        <span class="urp">${esc(it.pharm)} · ${mnlToET(it.due)}</span>
+      </div>`).join('')}</div>
+  </div>`;
+}
+function goToTask(pid,tid){
+  if(!isOpen(pid)){state.closedFolders=state.closedFolders.filter(x=>x!==pid);renderPharmacies();save();}
+  const el=document.getElementById('taskrow-'+pid+'-'+tid);
+  if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.add('flash-highlight');
+  setTimeout(()=>el.classList.remove('flash-highlight'),1600);
+}
+function jumpToHistory(tid){
+  openHistory();
+  setTimeout(()=>{
+    const el=document.getElementById('histrow-'+tid);
+    if(!el)return;
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.classList.add('flash-highlight');
+    setTimeout(()=>el.classList.remove('flash-highlight'),1600);
+  },60);
+}
+function openTaskForPharmacy(pid){
+  openTask();
+  document.getElementById('tPharm').value=pid;
+  toggleNewPharm();
+}
+function renderPharmacies(){
+  const wrap=document.getElementById('pharmList');
+  let ids=Object.keys(state.pharmacies);
+  if(activeFilter.size)ids=ids.filter(pid=>activeFilter.has(pid));
+  if(hideCompleted)ids=ids.filter(pid=>state.pharmacies[pid].tasks.some(t=>!t.done));
+  ids.sort((x,y)=>state.pharmacies[x].name.localeCompare(state.pharmacies[y].name));
+  if(!ids.length){
+    const msg = hideCompleted ? 'No pharmacies have unfinished tasks right now 🎉' : (activeFilter.size?'No pharmacies match your current filter.':'No pharmacies yet — add a task to create one.');
+    wrap.innerHTML=`<div class="empty-cat">${catSVG('sleep',4)}<span>${esc(msg)}</span></div>`;return;
+  }
+  wrap.innerHTML=ids.map((pid,i)=>{
+    const p=state.pharmacies[pid];
+    const base=hideCompleted?p.tasks.filter(t=>!t.done):p.tasks;
+    const sorted=[...base].sort((a,b)=>(a.done===b.done)?0:(a.done?1:-1));
+    const rows=sorted.length?sorted.map(task=>{
+      const rowClass = task.done ? 'row-done' : (task.urgent ? 'row-urgent' : 'row-active');
+      const pill = task.done ? '<span class="status-pill done-pill">✓ Done</span>' : (task.urgent ? '<span class="status-pill urgent-pill">⚠ Urgent</span>' : '<span class="status-pill active-pill">Active</span>');
+      return `
+      <tr id="taskrow-${pid}-${task.id}" class="${rowClass}">
+        <td class="task-name">${task.link?`<a class="hover-info task-link" href="${esc(task.link)}" target="_blank" rel="noopener">${esc(task.name)} 🔗<span class="tip">${esc(taskInfoTip(task))}</span></a>`:`<span class="hover-info">${esc(task.name)}<span class="tip">${esc(taskInfoTip(task))}</span></span>`}${pill}${noteChip(pid,task.id)}${timerHTML(pid,task)}</td>
+        <td>${mnlToET(task.due)}${task.due&&!task.done?`<div>${dcdHTML(task.due)}</div>`:''}</td>
+        <td>${task.notes?`<span class="note-link">View note<span class="tip">${esc(notesToTip(task.notes))}</span></span>`:'—'}</td>
+        <td><input type="checkbox" ${task.done?'checked':''} onchange="onDoneToggle('${pid}',${task.id},this)"></td>
+        <td class="actions"><button class="icon-btn" title="Edit" onclick="openTask('${pid}',${task.id})">✏️</button><button class="icon-btn danger" title="Delete" onclick="askDelete('task','${pid}:${task.id}')">🗑️</button></td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="5" class="empty">${hideCompleted?'No unfinished tasks here right now 🎉':'No tasks'}</td></tr>`;
+    const act=p.tasks.filter(t=>!t.done).length,urg=p.tasks.filter(t=>t.urgent&&!t.done).length,open=isOpen(pid);
+    return `<div class="pharm folder${open?' open':''}" style="--fc:${p.color};--tl:${[0,17,34,51][i%4]}%">
+      <div class="folder-tab" onclick="toggleFolder('${pid}',event)">${esc(p.name)}</div>
+      <div class="folder-front">
+        <div class="folder-head" onclick="toggleFolder('${pid}',event)">
+          <span><i class="caret">${open?'▾':'▸'}</i>${act} open, ${p.tasks.length-act} filed</span>
+          <span class="fh-meta">${urg?`<b class="fh-urg">${urg} urgent</b>`:''}
+            <button class="note-btn" title="Open this pharmacy's notes" onclick="event.stopPropagation();openNotes('${pid}')">Notes <b>${notesFor(pid).length}</b></button>
+            <button class="icon-btn" title="Add task to this pharmacy" onclick="event.stopPropagation();openTaskForPharmacy('${pid}')">➕</button>
+            <span class="pharm-menu-wrap">
+              <button class="icon-btn" title="More options" onclick="togglePharmMenu('${pid}',event)">⋮</button>
+              <div class="pharm-menu-panel" id="menu-${pid}">
+                <div class="pharm-menu-item" onclick="renamePharmacy('${pid}')">✏️ Rename pharmacy</div>
+                <div class="pharm-menu-item" onclick="openActivityLog('${esc(p.name)}')">📜 Activity log (this pharmacy)</div>
+                <div class="pharm-menu-item danger" onclick="askDelete('pharmacy-tasks','${pid}')">🧹 Delete all tasks here</div>
+                <div class="pharm-menu-item danger" onclick="askDelete('pharmacy','${pid}')">🗑️ Delete pharmacy</div>
+              </div>
+            </span>
+          </span>
+        </div>
+        <div class="folder-body"><table><thead><tr><th>Task</th><th style="width:124px">Time (ET)</th><th style="width:80px">Notes</th><th style="width:60px">Done</th><th style="width:94px">Manage</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openHistory(){
+  const hist=state.thingsHistory||[];
+  const list=document.getElementById('historyList');
+  list.innerHTML = hist.length ? [...hist].reverse().map((t)=>{
+    const tip=`ADDED\n${fmtBoth(t.createdAt)}\n\nDUE\n${t.due?fmtBoth(t.due):'—'}\n\nNOTES\n${notesToTip(t.notes)||'None'}`;
+    const c=colorFor(t.name);
+    return `<div class="hist-row" id="histrow-${t.id}" style="border-left-color:${c};background:color-mix(in srgb, ${c} 8%, var(--card))">
+      <div class="hname" data-tip="${esc(tip)}" onmouseenter="showTip(this,event)" onmousemove="positionTip(event)" onmouseleave="hideTip()">${esc(t.name)}</div>
+      <div><span class="hist-badge" style="background:${c}">✓ ${esc(new Date(t.completedAt).toLocaleString('en-US',{timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))} MNL</span></div>
+    </div>`;
+  }).join('') : '<p class="empty">No completed random tasks yet.</p>';
+  document.getElementById('historyModalBg').classList.add('show');
+}
+function showTip(el,evt){
+  const tip=document.getElementById('globalTip');
+  tip.textContent=el.getAttribute('data-tip');
+  tip.style.display='block';
+  positionTip(evt);
+}
+function positionTip(evt){
+  const tip=document.getElementById('globalTip');
+  const pad=14;
+  let x=evt.clientX+16, y=evt.clientY+16;
+  const maxX=window.innerWidth-tip.offsetWidth-pad, maxY=window.innerHeight-tip.offsetHeight-pad;
+  if(x>maxX)x=Math.max(pad,maxX);
+  if(y>maxY)y=Math.max(pad,maxY);
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hideTip(){document.getElementById('globalTip').style.display='none';}
+let pendingRenamePid=null;
+function renamePharmacy(pid){
+  pendingRenamePid=pid;
+  document.getElementById('renameInput').value=state.pharmacies[pid].name;
+  document.getElementById('renameModalBg').classList.add('show');
+  document.querySelectorAll('.pharm-menu-panel').forEach(p=>p.classList.remove('show'));
+}
+function saveRename(){
+  const name=document.getElementById('renameInput').value.trim();
+  if(!name)return notice('Please enter a pharmacy name.');
+  const oldName=state.pharmacies[pendingRenamePid].name;
+  state.pharmacies[pendingRenamePid].name=name;
+  logActivity('Renamed pharmacy',name,`was "${oldName}"`);
+  closeModal('renameModalBg');render();
+}
+function notice(msg,title){
+  document.getElementById('noticeTitle').textContent=title||'Heads up';
+  document.getElementById('noticeMsg').textContent=msg;
+  document.getElementById('noticeModalBg').classList.add('show');
+}
+function fillPharmSelect(){
+  const sel=document.getElementById('tPharm');
+  const ids=Object.keys(state.pharmacies);
+  const cur=sel.value;
+  sel.innerHTML=ids.map(id=>`<option value="${id}">${esc(state.pharmacies[id].name)}</option>`).join('')+`<option value="__new__">+ New pharmacy…</option>`;
+  if(cur && ids.includes(cur))sel.value=cur;
+}
+function toggleNewPharm(){document.getElementById('newPharmWrap').style.display=document.getElementById('tPharm').value==='__new__'?'block':'none';}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+// ---- Task modal ----
+let editingTask=null;
+function openTask(pid,tid){
+  editingTask = pid&&tid? {pid,tid} : null;
+  fillPharmSelect();
+  document.getElementById('taskModalTitle').textContent = editingTask?'Edit Task':'Add Task';
+  if(editingTask){
+    const task=state.pharmacies[pid].tasks.find(t=>t.id===tid);
+    document.getElementById('tPharm').value=pid;
+    document.getElementById('tName').value=task.name;
+    document.getElementById('tDue').value=task.due||'';
+    document.getElementById('tLink').value=task.link||'';
+    document.getElementById('tNotes').value=task.notes||'';
+    document.getElementById('tUrgent').checked=task.urgent;
+  } else {
+    document.getElementById('tName').value='';document.getElementById('tDue').value='';
+    document.getElementById('tLink').value='';
+    document.getElementById('tNotes').value='';document.getElementById('tUrgent').checked=false;
+  }
+  toggleNewPharm();
+  document.getElementById('taskModalBg').classList.add('show');
+}
+function saveTask(){
+  let pid=document.getElementById('tPharm').value;
+  const name=document.getElementById('tName').value.trim();
+  if(!name)return notice('Please enter a task name.');
+  if(pid==='__new__'){
+    const newName=document.getElementById('tNewPharm').value.trim();
+    if(!newName)return notice('Please enter a pharmacy name.');
+    pid='p'+uid();
+    state.pharmacies[pid]={name:newName,tasks:[]};
+  }
+  const due=document.getElementById('tDue').value;
+  const link=document.getElementById('tLink').value.trim();
+  const notes=document.getElementById('tNotes').value;
+  const urgent=document.getElementById('tUrgent').checked;
+  if(editingTask){
+    const task=state.pharmacies[editingTask.pid].tasks.find(t=>t.id===editingTask.tid);
+    if(task.due!==due)task.remind={};task.name=name;task.due=due;task.link=link;task.notes=notes;task.urgent=urgent;
+    logActivity('Edited task',state.pharmacies[editingTask.pid].name,name);
+  } else {
+    state.pharmacies[pid].tasks.push({id:uid(),name,due,link,notes,urgent,done:false,createdAt:new Date().toISOString(),completedAt:null});
+    logActivity('Added task',state.pharmacies[pid].name,name);
+  }
+  closeModal('taskModalBg');render();
+}
+let pendingMonday=null;
+function onDoneToggle(pid,tid,cb){
+  const task=state.pharmacies[pid].tasks.find(t=>t.id===tid);
+  if(cb.checked && !task.done){
+    pendingMonday={pid,tid};
+    document.getElementById('mondayModalBg').classList.add('show');
+  } else {
+    task.done=false;task.completedAt=null;task.mondayNote=null;render();
+  }
+}
+function resolveMonday(choice){
+  const {pid,tid}=pendingMonday;
+  const task=state.pharmacies[pid].tasks.find(t=>t.id===tid);
+  task.done=true;task.completedAt=new Date().toISOString();task.mondayNote=choice;
+  if(task.timer&&task.timer.startedAt){task.timer.elapsed=tElapsed(task.timer);task.timer.startedAt=null;}
+  logActivity('Completed task',state.pharmacies[pid].name,task.name);
+  closeModal('mondayModalBg');render();catReact('happy','Filed. Nice work.');
+}
+
+// ---- Things modal ----
+let editingThing=null;
+function openThing(id){
+  editingThing=id||null;
+  document.getElementById('thingModalTitle').textContent=id?'Edit Random Task':'Add Random Task';
+  const t=id?state.things.find(x=>x.id===id):null;
+  document.getElementById('thName').value=t?t.name:'';
+  document.getElementById('thDue').value=t?(t.due||''):'';
+  document.getElementById('thNotes').value=t?(t.notes||''):'';
+  document.getElementById('thingModalBg').classList.add('show');
+}
+function saveThing(){
+  const name=document.getElementById('thName').value.trim();
+  if(!name)return notice('Please enter a task name.');
+  const due=document.getElementById('thDue').value;
+  const notes=document.getElementById('thNotes').value;
+  if(editingThing){
+    const t=state.things.find(x=>x.id===editingThing);
+    t.name=name;t.due=due;t.notes=notes;
+  } else {
+    state.things.push({id:uid(),name,due,notes,done:false,createdAt:new Date().toISOString()});
+  }
+  closeModal('thingModalBg');render();
+}
+function completeThing(id){
+  const t=state.things.find(x=>x.id===id);
+  state.thingsHistory=state.thingsHistory||[];
+  state.thingsHistory.push({...t,completedAt:new Date().toISOString()});
+  state.things=state.things.filter(x=>x.id!==id);
+  render();catReact('happy','Done!');
+}
+
+// ---- Delete confirm ----
+let pendingDelete=null;
+function askDelete(type,id){
+  pendingDelete={type,id};
+  document.querySelectorAll('.pharm-menu-panel').forEach(p=>p.classList.remove('show'));
+  const msg={
+    task:'This task will be permanently deleted.',
+    thing:'This random task will be permanently deleted.',
+    pharmacy:'This pharmacy, all of its tasks (including unfinished ones), and its notes will be permanently deleted.',
+    note:'This note and its comments will be permanently deleted.',
+    'pharmacy-tasks':'All tasks in this pharmacy (active and completed) will be permanently deleted. The pharmacy itself will stay.'
+  }[type];
+  document.getElementById('delMsg').textContent=msg;
+  document.getElementById('delModalBg').classList.add('show');
+}
+function confirmDelete(){
+  const {type,id}=pendingDelete;
+  if(type==='note'){state.notes=(state.notes||[]).filter(n=>n.id!=id);npId=null;npEditing=false;closeModal('delModalBg');npRender();render();return;}
+  if(type==='thing'){
+    const t=state.things.find(x=>x.id===id);
+    logActivity('Deleted random task','',t?t.name:'');
+    state.things=state.things.filter(x=>x.id!==id);
+  }
+  if(type==='pharmacy'){
+    logActivity('Deleted pharmacy',state.pharmacies[id]?.name||'');
+    delete state.pharmacies[id];activeFilter.delete(id);state.notes=(state.notes||[]).filter(n=>n.scope!==id);
+  }
+  if(type==='pharmacy-tasks'){
+    const p=state.pharmacies[id];
+    if(p){logActivity('Cleared all tasks',p.name,`${p.tasks.length} task(s) removed`);p.tasks=[];}
+  }
+  if(type==='task'){
+    const [pid,tid]=id.split(':');
+    const task=state.pharmacies[pid].tasks.find(t=>t.id==tid);
+    logActivity('Deleted task',state.pharmacies[pid].name,task?task.name:'');
+    state.pharmacies[pid].tasks=state.pharmacies[pid].tasks.filter(t=>t.id!=tid);
+  }
+  closeModal('delModalBg');render();
+}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg){if(bg.id==='noteModalBg'){closeNotes();return;}bg.classList.remove('show');render();}}));
+
+// ===== Office skin: pixel icons, cat, menus, folders =====
+const PX={K:'#1B1A1F',W:'#FFFDF4',R:'#C0392B',S:'#E0A527',G:'#6B8F5F',P:'#7A4A63',B:'#2C4A66',E:'#D9B93C',N:'#E58C9A',g:'#7A7A88'};
+function px(rows,s,crop){
+  const h=crop||rows.length,w=rows[0].length;let r='';
+  for(let y=0;y<h;y++){const row=rows[y];let x=0;while(x<w){const c=row[x];if(c==='.'){x++;continue;}let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${PX[c]}"/>`;x+=n;}}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w*s}" height="${h*s}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+const ICONS={
+ today:['KKKKKKKKKK','KRRRRRRRRK','KRRRRRRRRK','KWWWWWWWWK','KWKWKWKWWK','KWWWWWWWWK','KWKWKWKWWK','KWWWWWWWWK','KKKKKKKKKK'],
+ active:['KKKKKKKKKK','.KWWWWWWK.','..KWSSWK..','...KSSK...','....KK....','...KSSK...','..KSSSSK..','.KSSSSSSK.','KKKKKKKKKK'],
+ doneToday:['KKKKKKKKKK','KGGGGGGGGK','KGGGGGGWGK','KGGGGGWWGK','KWGGGWWGGK','KWWGWWGGGK','KGWWWGGGGK','KGGWGGGGGK','KGGGGGGGGK','KKKKKKKKKK'],
+ total:['KKKKKKKKKK','KWWWWWWWWK','KWKKKKKKWK','KWWWWWWWWK','KWKKKKKKWK','KWWWWWWWWK','KWKKKKKWWK','KWWWWWWWWK','KKKKKKKKKK'],
+ done:['KK........','KKPPPPPP..','KKPPPPPPPP','KKPPPPPPPP','KKPPPPPP..','KK........','KK........','KK........','KKKK......']
+};
+const ICOL={today:'var(--sky)',active:'var(--amber)',doneToday:'var(--sage)',total:'var(--navy)',done:'var(--plum)'};
+// cat: black-and-white tuxedo. Edit PX.E for eye color, CAT_BASE rows for markings.
+const CAT_BASE=['..KK........KK..','..KKK......KKK..','.KKKKKKKKKKKKKK.','.KKKKKKKKKKKKKK.','','','.KKKKKWNNWKKKKK.','.KKKKKWWWWKKKKK.','..KKKKWWWWKKKK..','..KKKKKWWKKKKK..','.KKKKKKWWKKKKKK.','.KKKKKKWWKKKKKK.','.KKKKKKKKKKKKKK.','.KKWWKKKKKKWWKK.'];
+const CAT_EYES={sit:['.KKKEEKKKKEEKKK.','.KKKKKKKKKKKKKK.'],alert:['.KKKEEKKKKEEKKK.','.KKKEEKKKKEEKKK.'],happy:['.KKKEKKKKKKEKKK.','.KKEKEKKKKEKEKK.'],blink:['.KKKggKKKKggKKK.','.KKKKKKKKKKKKKK.']};
+const CAT_LOAF=['..K.K...........','.KKKKKKKKKK.....','.KggKKKKKKKKKK..','.KWWWKKKKKKKKKK.','.KKWWKKKKKKKKKK.','.KWWWWKKKKKKKKKK','..KKKKKKKKKKKKK.'];
+function catSVG(m,s,crop){
+  const rows=m==='sleep'?CAT_LOAF:CAT_BASE.map((r,i)=>i===4?CAT_EYES[m][0]:i===5?CAT_EYES[m][1]:r);
+  return px(rows,s,crop);
+}
+function emptyCat(msg){return `<div class="empty-cat">${catSVG('sleep',4)}<span>${esc(msg)}</span></div>`;}
+let catMood='sit',catBase='sit',catAwake=true,catForce=false,catMuted=false,catIdle=null,catSayT=null,catRevert=null,catLastMove=0;
+function catCounts(){let urgent=0;for(const pid in state.pharmacies)for(const t of state.pharmacies[pid].tasks)if(t.urgent&&!t.done)urgent++;const d=buildDashData();return{urgent,today:d.todayList.length,active:d.activeList.length};}
+function catDraw(){
+  const el=document.getElementById('deskCat');if(!el)return;
+  const keep=el.querySelector('.cat-say');
+  el.innerHTML=(keep?keep.outerHTML:'<div class="cat-say"></div>')+(catMood==='sleep'?'<span class="zzz">z z</span>':'')+catSVG(catMood,4);
+}
+function catSetMood(m){catMood=m;catDraw();}
+function catRefresh(){const c=catCounts();catBase=c.urgent?'alert':'sit';if(!catRevert)catSetMood(catAwake?catBase:'sleep');updateTaskbar(c);}
+function catSay(msg,ms){const b=document.querySelector('#deskCat .cat-say');if(!b)return;b.textContent=msg;b.classList.add('show');clearTimeout(catSayT);catSayT=setTimeout(()=>{const x=document.querySelector('#deskCat .cat-say');if(x)x.classList.remove('show');},ms);}
+function catReact(m,msg,ms){
+  ms=ms||2600;clearTimeout(catRevert);catAwake=true;catSetMood(m);
+  const el=document.getElementById('deskCat');el.classList.remove('hop');void el.offsetWidth;if(m==='happy')el.classList.add('hop');
+  if(msg)catSay(msg,ms);
+  catRevert=setTimeout(()=>{catRevert=null;catSetMood(catBase);catSleepSoon();},ms);
+}
+function catSleepSoon(){clearTimeout(catIdle);catIdle=setTimeout(()=>{if(catBase!=='alert'&&!catRevert){catAwake=false;catSetMood('sleep');}},45000);}
+function catWake(){
+  if(catForce)return;const now=Date.now();if(now-catLastMove<4000)return;catLastMove=now;
+  if(!catAwake&&!catRevert){catAwake=true;catSetMood(catBase);}catSleepSoon();
+}
+function catNap(){catForce=!catForce;catAwake=!catForce;clearTimeout(catIdle);catSetMood(catForce?'sleep':catBase);if(!catForce)catSleepSoon();}
+function catMute(){catMuted=!catMuted;catSay(catMuted?'Meows muted.':'Meows on.',1800);}
+function meow(){
+  if(catMuted)return;
+  try{unlockAudio();if(!audioCtx)return;const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='triangle';o.frequency.setValueAtTime(520,t);o.frequency.exponentialRampToValueAtTime(900,t+.12);o.frequency.exponentialRampToValueAtTime(420,t+.38);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+.4);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.42);}catch(e){}
+}
+function catPet(){
+  meow();const c=catCounts(),s=n=>n===1?'':'s';
+  catReact('happy',c.urgent?`${c.urgent} urgent task${s(c.urgent)} waiting. Start there.`:c.today?`${c.today} task${s(c.today)} due today.`:'Nothing due today. Nap time.',3200);
+}
+function updateTaskbar(c){const el=document.getElementById('tbStatus');if(el)el.textContent=`${c.today} due today, ${c.active} unfinished${c.urgent?', '+c.urgent+' urgent':''}`;}
+function tickClock(){const f=z=>new Date().toLocaleTimeString('en-US',{timeZone:z,hour:'numeric',minute:'2-digit'});const el=document.getElementById('tbClock');if(el)el.textContent=`MNL ${f('Asia/Manila')}  ET ${f('America/New_York')}`;}
+// menus
+function closeMB(){document.querySelectorAll('.mb-panel.show').forEach(p=>p.classList.remove('show'));document.querySelectorAll('.mb-btn.on').forEach(b=>b.classList.remove('on'));}
+function toggleMB(btn,ev){ev.stopPropagation();const p=btn.nextElementSibling,was=p.classList.contains('show');closeMB();if(!was){p.classList.add('show');btn.classList.add('on');}}
+document.addEventListener('click',closeMB);
+function showHelp(){notice('Each pharmacy is a folder in the drawer. Click a folder tab to open or close it. The A–Z tabs filter the drawer to pharmacies starting with that letter; click a lit tab again to clear it. Click the cat for a status check.','How the file drawer works');}
+// file drawer
+function isOpen(pid){return !(state.closedFolders||[]).includes(pid);}
+function toggleFolder(pid,ev){
+  if(ev&&ev.target.closest('.icon-btn,.pharm-menu-panel'))return;
+  const c=state.closedFolders=state.closedFolders||[],i=c.indexOf(pid);
+  if(i>=0)c.splice(i,1);else c.push(pid);
+  renderPharmacies();save();
+}
+function setAllFolders(open){state.closedFolders=open?[]:Object.keys(state.pharmacies);renderPharmacies();save();}
+function azKey(name){const L=(name.trim()[0]||'#').toUpperCase();return /[A-Z]/.test(L)?L:'#';}
+function renderAZ(){
+  const by={};Object.keys(state.pharmacies).forEach(pid=>{(by[azKey(state.pharmacies[pid].name)]=by[azKey(state.pharmacies[pid].name)]||[]).push(pid);});
+  document.getElementById('azIndex').innerHTML='ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('').map(L=>{
+    const ids=by[L]||[],on=ids.length&&ids.every(p=>activeFilter.has(p));
+    return `<button type="button" class="az-tab ${ids.length?'has':''} ${on?'on':''}" ${ids.length?`onclick="toggleLetter('${L}')" title="${ids.length} pharmac${ids.length===1?'y':'ies'}"`:'disabled'}>${L}</button>`;
+  }).join('');
+}
+function toggleLetter(L){
+  const ids=Object.keys(state.pharmacies).filter(p=>azKey(state.pharmacies[p].name)===L),on=ids.every(p=>activeFilter.has(p));
+  ids.forEach(p=>on?activeFilter.delete(p):activeFilter.add(p));
+  renderPharmFilterList();renderDash();renderToday();renderPharmacies();renderUrgent();
+}
+['mousemove','keydown','touchstart','scroll'].forEach(e=>addEventListener(e,catWake,{passive:true}));
+setInterval(()=>{if(catAwake&&!catRevert&&catMood==='sit'){catSetMood('blink');setTimeout(()=>{if(catMood==='blink')catSetMood(catBase);},140);}},4200);
+tickClock();setInterval(tickClock,20000);
+// ===== Notepad (general + per pharmacy) =====
+ICONS.notes=['.K.K.K.K..','KKKKKKKKKK','KSSSSSSSSK','KSKKKKKKSK','KSSSSSSSSK','KSKKKKKSSK','KSSSSSSSSK','KSKKKKSSSK','KKKKKKKKKK'];
+ICOL.notes='var(--amber)';
+let npScope='general',npId=null,npEditing=false,npSnap=null,npRange=null;
+const NP_TEXT=['#1F8A82','#4D86A8','#7A4A63','#C77B30','#C0392B','#6B8F5F'];
+const NP_HI=['#FFE98A','#BFE8D4','#F6C6D2','#C5DDF0','#E9D3F0'];
+const NP_SIZES=[['Small',2],['Normal',3],['Large',5],['Extra large',6]];
+const NP_OK=new Set(['B','STRONG','I','EM','U','S','SPAN','FONT','DIV','P','BR','UL','OL','LI']);
+function notesFor(scope){return (state.notes||[]).filter(n=>n.scope===scope).sort((a,b)=>new Date(b.updated)-new Date(a.updated));}
+function curNote(){return (state.notes||[]).find(n=>n.id===npId);}
+function noteTile(){return `<div class="stat clickable" onclick="openNotes('general')" title="Open the general notepad"><div class="ico">${px(ICONS.notes,4)}<i class="cnt">${notesFor('general').length}</i></div><span class="lbl">Notepad</span></div>`;}
+let noteIdx={};
+function attRef(a,n){return typeof a==='object'?a:{pid:n.scope,tid:a};}
+function noteRefs(n){
+  const out=(n.attached||[]).map(a=>attRef(a,n));
+  const t=document.createElement('template');t.innerHTML=n.html||'';
+  t.content.querySelectorAll('.tasklink').forEach(l=>out.push({pid:l.dataset.pid||n.scope,tid:l.dataset.task}));
+  return out;
+}
+function buildNoteIndex(){const m={};(state.notes||[]).forEach(n=>{const seen=new Set();noteRefs(n).forEach(r=>{const k=r.pid+':'+r.tid;if(seen.has(k))return;seen.add(k);(m[k]=m[k]||[]).push(n);});});return m;}
+function noteChip(pid,tid){
+  const hit=noteIdx[pid+':'+tid]||[];
+  return hit.length?`<button class="note-chip" title="Linked in note: ${esc(hit[0].title||'Untitled note')}" onclick="openNotes('${hit[0].scope}',${hit[0].id})">Note${hit.length>1?' x'+hit.length:''}</button>`:'';
+}
+function findTarget(pid,tid){
+  if(pid==='things'){const t=state.things.find(x=>x.id==tid);return t?{name:t.name,group:'Random tasks'}:null;}
+  const p=state.pharmacies[pid],t=p&&p.tasks.find(x=>x.id==tid);
+  return t?{name:t.name,group:p.name,done:t.done}:null;
+}
+function cleanHTML(html){
+  const t=document.createElement('template');t.innerHTML=html;
+  (function walk(node){
+    [...node.childNodes].forEach(ch=>{
+      if(ch.nodeType===3)return;
+      if(ch.nodeType!==1){ch.remove();return;}
+      if(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED'].includes(ch.tagName)){ch.remove();return;}
+      walk(ch);
+      if(!NP_OK.has(ch.tagName)){while(ch.firstChild)ch.parentNode.insertBefore(ch.firstChild,ch);ch.remove();return;}
+      [...ch.attributes].forEach(a=>{
+        const n=a.name;
+        if(n==='style'){if(/url\(|expression|@import/i.test(a.value))ch.removeAttribute(n);}
+        else if(n==='data-task'){if(!/^\d+$/.test(a.value))ch.removeAttribute(n);}
+        else if(n==='data-pid'){if(!/^(p\d+|things)$/.test(a.value))ch.removeAttribute(n);}
+        else if(n==='class'){if(/\btasklink\b/.test(a.value))ch.setAttribute('class','tasklink');else ch.removeAttribute(n);}
+        else if(n!=='color'&&n!=='size')ch.removeAttribute(n);
+      });
+    });
+  })(t.content);
+  return t.innerHTML;
+}
+function npText(html){const t=document.createElement('template');t.innerHTML=html||'';return (t.content.textContent||'').trim();}
+function npSnip(html){return npText(html).slice(0,70)||'(empty)';}
+function npHide(){document.getElementById('noteModalBg').classList.remove('show');document.body.classList.remove('np-open');closePop();}
+function openNotes(scope,id){
+  if(npEditing)npCommit();
+  npScope=scope;npId=id||null;npEditing=false;npRender();
+  document.getElementById('noteModalBg').classList.add('show');document.body.classList.add('np-open');
+}
+function closeNotes(){if(npEditing)npCommit();npEditing=false;npHide();render();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('noteModalBg').classList.contains('show')&&!document.querySelector('.modal-bg.show:not(#noteModalBg)'))closeNotes();});
+function npRender(){
+  if(npId==null||!curNote()){const l=notesFor(npScope);npId=l[0]?l[0].id:null;}
+  document.getElementById('npTitle').textContent=npScope==='general'?'Notepad: general notes':'Notes: '+(state.pharmacies[npScope]?state.pharmacies[npScope].name:'');
+  const list=notesFor(npScope);
+  document.getElementById('npList').innerHTML=list.length?list.map(n=>`<div class="np-item ${n.id===npId?'on':''}" onclick="npSelect(${n.id})"><b>${esc(n.title||'Untitled note')}</b><span>${esc(npSnip(n.html))}</span><i>${esc(mnlToET(n.updated))}</i></div>`).join(''):'<p class="empty">No notes yet</p>';
+  npMainRender();
+}
+function npSelect(id){if(npEditing)npCommit();npId=id;npRender();}
+function newNote(){
+  if(npEditing)npCommit();
+  state.notes=state.notes||[];const now=new Date().toISOString();
+  const n={id:uid(),scope:npScope,title:'',html:'',attached:[],comments:[],created:now,updated:now};
+  state.notes.push(n);npId=n.id;npSnap={title:'',html:'',attached:[]};npEditing=true;npRender();
+}
+function npToolbar(isP){
+  return `<div class="np-tools" onmousedown="if(event.target.closest('button'))event.preventDefault()">
+   <button title="Bold" onclick="npCmd('bold')"><b>B</b></button>
+   <button title="Italic" onclick="npCmd('italic')"><i>I</i></button>
+   <button title="Underline" onclick="npCmd('underline')"><u>U</u></button>
+   <span class="tbw"><button onclick="togglePop(this,event)">Size ▾</button><div class="pop">${NP_SIZES.map(s=>`<button class="pi" onclick="npCmd('fontSize',${s[1]});closePop()">${s[0]}</button>`).join('')}</div></span>
+   <span class="tbw"><button onclick="togglePop(this,event)">Color ▾</button><div class="pop">${NP_TEXT.map(c=>`<button class="sw" style="background:${c}" title="Text color" onclick="npCmd('foreColor','${c}');closePop()"></button>`).join('')}</div></span>
+   <span class="tbw"><button onclick="togglePop(this,event)">Highlight ▾</button><div class="pop">${NP_HI.map(c=>`<button class="sw" style="background:${c}" title="Highlight" onclick="npCmd('hiliteColor','${c}');closePop()"></button>`).join('')}<button class="pi" onclick="npCmd('hiliteColor','transparent');closePop()">No highlight</button></div></span>
+   <span class="tbw"><button onclick="npLinkPop(this,event)">Link to task ▾</button><div class="pop pop-list" onclick="event.stopPropagation()"></div></span><button onclick="npUnlink()">Remove link</button>
+   <button onclick="npCmd('removeFormat')">Clear formatting</button></div>`;
+}
+function npMainRender(){
+  const m=document.getElementById('npMain'),n=curNote(),isP=npScope!=='general',ed=npEditing;
+  if(!n){m.className='np-main';m.innerHTML=`<div class="empty-cat">${catSVG('sleep',4)}<span>${isP?'No notes for this pharmacy yet. Click + New note to start one.':'No general notes yet. Click + New note to start one.'}</span></div>`;return;}
+  m.className='np-main'+(ed?' np-editing':'');
+  m.innerHTML=`<div class="np-head">
+     ${ed?`<input id="npTitleIn" class="np-title-in" placeholder="Note title" maxlength="80" value="${esc(n.title)}" oninput="npLiveTitle(this.value)">`:`<h3 class="np-note-title">${esc(n.title||'Untitled note')}</h3>`}
+     <div class="np-actions">${ed?`<button class="primary" onclick="npSave()">Save</button><button class="ghost" onclick="npCancel()">Cancel</button>`:`<button class="ghost" onclick="npEdit()">Edit</button><button class="ghost" style="color:var(--urgent)" onclick="askDelete('note',${n.id})">Delete</button>`}</div>
+   </div>
+   <div class="np-meta">Last saved ${esc(mnlToET(n.updated))} ET${ed?'. Changes also save when you switch notes or close.':''}</div>
+   ${ed?npToolbar(isP)+'<div class="np-hint">To link a task: highlight some words, click <b>Link to task</b>, and pick the task. Nothing highlighted? The task name is added as a link. Later, click a linked phrase to jump to that task.</div>':(/tasklink/.test(n.html||'')?'<div class="np-hint">Phrases marked with ↗ are linked to tasks. Click one to jump to it.</div>':'')}
+   <div id="npEditor" class="np-editor" contenteditable="${ed}" spellcheck="true" onpaste="npPaste(event)" onclick="npEdClick(event)" oninput="npLiveSnip()">${n.html||''}</div>
+   <div id="npAtt" class="np-att"></div>
+   <h4>Comments</h4><div id="npCmts"></div>
+   <textarea id="npCmtIn" rows="2" placeholder="Add a comment on this note"></textarea>
+   <div style="text-align:right;margin-top:6px"><button class="ghost" onclick="npAddComment()">Add comment</button></div>`;
+  npAttRender();npCmtRender();npMarkLinks();
+  if(ed){const t=document.getElementById('npTitleIn');if(!n.title)t.focus();else document.getElementById('npEditor').focus();}
+}
+function npEdit(){const n=curNote();if(!n)return;npSnap={title:n.title,html:n.html,attached:[...(n.attached||[])]};npEditing=true;npRender();}
+function npCommit(){
+  const n=curNote();if(!n||!npEditing)return;
+  const ti=document.getElementById('npTitleIn'),ed=document.getElementById('npEditor');
+  if(ti&&ed){
+    const html=cleanHTML(ed.innerHTML),title=ti.value.trim();
+    if(html!==n.html||title!==n.title||JSON.stringify(n.attached||[])!==JSON.stringify(npSnap?npSnap.attached:[]))n.updated=new Date().toISOString();
+    n.html=html;n.title=title;
+  }
+  npEditing=false;npDropIfEmpty(n);save();
+}
+function npDropIfEmpty(n){if(!n.title&&!npText(n.html)&&!(n.attached||[]).length&&!(n.comments||[]).length){state.notes=state.notes.filter(x=>x!==n);if(npId===n.id)npId=null;}}
+function npSave(){npCommit();npRender();}
+function npCancel(){const n=curNote();if(n&&npSnap){n.title=npSnap.title;n.html=npSnap.html;n.attached=npSnap.attached;}npEditing=false;if(n)npDropIfEmpty(n);save();npRender();}
+function npPaste(e){e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'));}
+function npCmd(cmd,val){const ed=document.getElementById('npEditor');if(!ed||!npEditing)return;ed.focus();document.execCommand('styleWithCSS',false,true);document.execCommand(cmd,false,val===undefined?null:val);}
+function closePop(){document.querySelectorAll('.pop.show').forEach(p=>p.classList.remove('show'));}
+function togglePop(btn,ev){ev.stopPropagation();const p=btn.nextElementSibling,was=p.classList.contains('show');closePop();if(!was)p.classList.add('show');}
+document.addEventListener('click',closePop);
+function npLiveTitle(v){const b=document.querySelector('#npList .np-item.on b');if(b)b.textContent=v.trim()||'Untitled note';}
+function npLiveSnip(){const s=document.querySelector('#npList .np-item.on span'),e=document.getElementById('npEditor');if(s&&e)s.textContent=e.textContent.trim().slice(0,70)||'(empty)';}
+function npPickerHTML(head,fn,exclude){
+  const groups=[];
+  if(npScope==='general'){
+    Object.keys(state.pharmacies).sort((x,y)=>state.pharmacies[x].name.localeCompare(state.pharmacies[y].name)).forEach(pid=>groups.push({pid,label:state.pharmacies[pid].name,tasks:state.pharmacies[pid].tasks}));
+    groups.push({pid:'things',label:'Random tasks (Things)',tasks:state.things});
+  } else if(state.pharmacies[npScope])groups.push({pid:npScope,label:state.pharmacies[npScope].name,tasks:state.pharmacies[npScope].tasks});
+  let n=0;
+  const body=groups.map(g=>{
+    const ts=[...g.tasks].filter(t=>!exclude.has(g.pid+':'+t.id)).sort((x,y)=>(x.done?1:0)-(y.done?1:0));
+    if(!ts.length)return '';n+=ts.length;
+    return (groups.length>1?`<div class="pg">${esc(g.label)}</div>`:'')+ts.map(t=>`<button class="pi" data-s="${esc((g.label+' '+t.name).toLowerCase())}" onclick="${fn}('${g.pid}',${t.id})">${esc(t.name)}${t.done?' (done)':''}${t.urgent&&!t.done?' (urgent)':''}</button>`).join('');
+  }).join('');
+  return `<div class="pk-h">${head}</div>`+(n?`${n>6?'<input class="pk-s" placeholder="Search tasks" oninput="npPickFilter(this)">':''}<div class="pk-items">${body}</div>`:'<div class="empty" style="padding:6px">No tasks available to choose from.</div>');
+}
+function npPickFilter(inp){
+  const q=inp.value.toLowerCase().trim(),box=inp.closest('.pop');let grp=null,vis=0;
+  box.querySelectorAll('.pg,.pi').forEach(el=>{
+    if(el.classList.contains('pg')){if(grp)grp.style.display=vis?'':'none';grp=el;vis=0;}
+    else{const ok=el.dataset.s.includes(q);el.style.display=ok?'':'none';if(ok)vis++;}
+  });
+  if(grp)grp.style.display=vis?'':'none';
+}
+function npLinkPop(btn,ev){
+  ev.stopPropagation();
+  const ed=document.getElementById('npEditor'),sel=getSelection();
+  npRange=sel.rangeCount&&ed.contains(sel.anchorNode)&&ed.contains(sel.focusNode)?sel.getRangeAt(0).cloneRange():null;
+  const txt=npRange&&!npRange.collapsed?npRange.toString().trim():'';
+  const head=txt?`Link <b>“${esc(txt.slice(0,40))}”</b> to:`:'Nothing is highlighted, so the task name will be added to your note as a link. To link your own words instead, highlight them first.';
+  const p=btn.nextElementSibling;closePop();p.innerHTML=npPickerHTML(head,'npApplyLink',new Set());p.classList.add('show');
+}
+function unwrapEl(x){while(x.firstChild)x.parentNode.insertBefore(x.firstChild,x);x.remove();}
+function npApplyLink(pid,tid){
+  const ed=document.getElementById('npEditor');if(!ed||!npEditing)return;
+  const tg=findTarget(pid,tid);if(!tg){notice('That task no longer exists.','Task not found');return;}
+  const span=document.createElement('span');span.className='tasklink';span.dataset.pid=pid;span.dataset.task=tid;
+  ed.focus();const sel=getSelection();let r=npRange;
+  if(!r||!ed.contains(r.commonAncestorContainer)){r=document.createRange();r.selectNodeContents(ed);r.collapse(false);}
+  if(r.collapsed){span.textContent=tg.name;r.insertNode(span);const sp=document.createTextNode('\u00A0');span.after(sp);r.setStartAfter(sp);r.collapse(true);}
+  else{span.appendChild(r.extractContents());span.querySelectorAll('.tasklink').forEach(unwrapEl);r.insertNode(span);r.setStartAfter(span);r.collapse(true);}
+  sel.removeAllRanges();sel.addRange(r);npRange=null;closePop();npMarkLinks();npLiveSnip();
+}
+function npUnlink(){
+  const ed=document.getElementById('npEditor'),sel=getSelection();
+  const r=sel.rangeCount&&ed.contains(sel.anchorNode)?sel.getRangeAt(0):null;
+  const hit=r?[...ed.querySelectorAll('.tasklink')].filter(l=>r.intersectsNode(l)):[];
+  if(!hit.length){notice('Click inside a linked phrase (or highlight it), then choose Remove link.','No link selected');return;}
+  hit.forEach(unwrapEl);
+}
+function npMarkLinks(){
+  const ed=document.getElementById('npEditor');if(!ed)return;
+  ed.querySelectorAll('.tasklink').forEach(l=>{const tg=findTarget(l.dataset.pid||npScope,l.dataset.task);l.classList.toggle('dead',!tg);l.title=tg?(npEditing?'Linked to: ':'Go to task: ')+tg.name+(npScope==='general'?' ('+tg.group+')':''):'This task no longer exists';});
+}
+function npEdClick(ev){if(npEditing)return;const l=ev.target.closest('.tasklink');if(l)openLinkedTask(l.dataset.pid||npScope,l.dataset.task);}
+function flashEl(id){const el=document.getElementById(id);if(!el)return;el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash-highlight');setTimeout(()=>el.classList.remove('flash-highlight'),1600);}
+function openLinkedTask(pid,tid){
+  const tg=findTarget(pid,tid);
+  if(!tg){notice('That task no longer exists. It was deleted or, for random tasks, completed.','Task not found');return;}
+  if(npEditing)npCommit();
+  npHide();
+  if(pid==='things'){render();setTimeout(()=>flashEl('thingrow-'+tid),60);return;}
+  const t=state.pharmacies[pid].tasks.find(x=>x.id==tid);
+  if(activeFilter.size&&!activeFilter.has(pid))activeFilter.clear();
+  if(hideCompleted&&t.done)hideCompleted=false;
+  state.closedFolders=(state.closedFolders||[]).filter(x=>x!==pid);
+  render();setTimeout(()=>goToTask(pid,t.id),60);
+}
+function npAttRender(){
+  const box=document.getElementById('npAtt'),n=curNote();if(!box||!n)return;
+  const chips=(n.attached||[]).map(a=>{const r=attRef(a,n),tg=findTarget(r.pid,r.tid);
+    return `<span class="chip${tg?'':' dead'}" onclick="openLinkedTask('${r.pid}',${r.tid})" title="${tg?'Go to this task':'This task no longer exists'}">${tg?esc((npScope==='general'?tg.group+': ':'')+tg.name):'Deleted task'}${npEditing?` <b onclick="event.stopPropagation();npUnattach('${r.pid}',${r.tid})">×</b>`:''}</span>`;}).join('');
+  box.innerHTML=`<h4>Attached tasks</h4><div>${chips||'<span class="empty">None attached.'+(npEditing?'':' Click Edit to attach tasks to this note.')+'</span>'}</div>${npEditing?'<span class="tbw"><button class="ghost" onclick="npAttachPop(this,event)">+ Attach task ▾</button><div class="pop pop-list" onclick="event.stopPropagation()"></div></span>':''}`;
+}
+function npAttachPop(btn,ev){
+  ev.stopPropagation();const n=curNote(),p=btn.nextElementSibling;closePop();
+  p.innerHTML=npPickerHTML('Attach a task to this note. It shows as a chip you can click to jump to the task.','npAttach',new Set((n.attached||[]).map(a=>{const r=attRef(a,n);return r.pid+':'+r.tid;})));
+  p.classList.add('show');
+}
+function npAttach(pid,tid){const n=curNote();n.attached=n.attached||[];if(!n.attached.some(a=>{const r=attRef(a,n);return r.pid===pid&&String(r.tid)===String(tid);}))n.attached.push({pid,tid:Number(tid)});closePop();npAttRender();}
+function npUnattach(pid,tid){const n=curNote();n.attached=(n.attached||[]).filter(a=>{const r=attRef(a,n);return !(r.pid===pid&&String(r.tid)===String(tid));});npAttRender();}
+function npCmtRender(){
+  const box=document.getElementById('npCmts'),n=curNote();if(!box||!n)return;
+  box.innerHTML=(n.comments||[]).length?n.comments.map(c=>`<div class="cmt"><div class="cmt-top"><span>${esc(mnlToET(c.ts))} ET</span><button class="icon-btn danger" title="Delete comment" onclick="npDelComment(${c.id})">🗑️</button></div><div class="cmt-tx">${esc(c.text)}</div></div>`).join(''):'<p class="empty">No comments yet.</p>';
+}
+function npAddComment(){const n=curNote(),i=document.getElementById('npCmtIn');if(!n||!i)return;const t=i.value.trim();if(!t)return;(n.comments=n.comments||[]).push({id:uid(),text:t,ts:new Date().toISOString()});i.value='';save();npCmtRender();}
+function npDelComment(cid){const n=curNote();n.comments=(n.comments||[]).filter(c=>c.id!==cid);save();npCmtRender();}
+// ===== Deadlines + task timers =====
+function pad2(n){return String(n).padStart(2,'0');}
+function quickDue(id,days){
+  const el=document.getElementById(id);
+  if(days===null){el.value='';return;}
+  const time=el.value&&el.value.includes('T')?el.value.split('T')[1]:'17:00';
+  const d=new Date();d.setDate(d.getDate()+days);
+  el.value=`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${time}`;
+}
+function dcd(iso){
+  const ms=new Date(iso)-Date.now(),a=Math.abs(ms),d=Math.floor(a/864e5),h=Math.floor(a%864e5/36e5),m=Math.floor(a%36e5/6e4);
+  const t=d?`${d}d ${h}h`:h?`${h}h ${m}m`:m?`${m}m`:'<1m';
+  return {txt:ms<0?`Overdue ${t}`:`Due in ${t}`,cls:ms<0?'over':ms<864e5?'soon':'ok'};
+}
+function dcdHTML(iso){const c=dcd(iso);return `<span class="dcd ${c.cls}" data-due="${iso}">${c.txt}</span>`;}
+function tHost(pid,tid){return pid==='things'?state.things.find(x=>x.id==tid):((state.pharmacies[pid]||{}).tasks||[]).find(x=>x.id==tid);}
+function tElapsed(t){return (t.elapsed||0)+(t.startedAt?Date.now()-t.startedAt:0);}
+function tFmt(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?`${h}:${pad2(m)}:${pad2(s%60)}`:`${m}:${pad2(s%60)}`;}
+function tLabel(t){return t.mode==='down'?(t.fired?"Time's up":`${tFmt(t.target-tElapsed(t))} left`):tFmt(tElapsed(t));}
+function timerHTML(pid,task){
+  const t=task.timer,key=pid+':'+task.id;
+  if(task.done){const e=t?tElapsed(t):0;return e>=1000?`<div class="tmr fin">Time spent: ${tFmt(e)}</div>`:'';}
+  if(!t){
+    const mid='tm_'+pid+'_'+task.id,go=m=>`onclick="timerStart('${pid}',${task.id},${m})"`;
+    return `<div class="tmr"><span class="pharm-menu-wrap"><button class="tmr-b" title="Start a timer for this task" onclick="togglePharmMenu('${mid}',event)">Timer ▾</button><div class="pharm-menu-panel" id="menu-${mid}"><div class="pharm-menu-item" ${go(0)}>Stopwatch (counts up)</div>${[10,15,25,30,45,60,90].map(m=>`<div class="pharm-menu-item" ${go(m)}>Countdown: ${m} min</div>`).join('')}</div></span></div>`;
+  }
+  const run=!!t.startedAt,fin=t.mode==='down'&&t.fired;
+  return `<div class="tmr${run?' run':''}${fin?' fin':''}"><span class="tmr-t" data-key="${key}">${tLabel(t)}</span>${fin?'':`<button class="tmr-b" onclick="timerToggle('${pid}',${task.id})">${run?'Pause':'Resume'}</button>`}<button class="tmr-b" onclick="timerReset('${pid}',${task.id})">Reset</button></div>`;
+}
+function timerStart(pid,tid,mins){
+  const x=tHost(pid,tid);if(!x)return;unlockAudio();
+  x.timer=mins?{mode:'down',target:mins*60000,elapsed:0,startedAt:Date.now(),fired:false}:{mode:'up',elapsed:0,startedAt:Date.now()};
+  render();
+}
+function timerToggle(pid,tid){
+  const x=tHost(pid,tid);if(!x||!x.timer)return;const t=x.timer;unlockAudio();
+  if(t.startedAt){t.elapsed=tElapsed(t);t.startedAt=null;}else t.startedAt=Date.now();
+  render();
+}
+function timerReset(pid,tid){const x=tHost(pid,tid);if(!x)return;delete x.timer;render();}
+function timerTick(){
+  const fin=[];
+  const chk=(x,who)=>{const t=x.timer;if(!t||!t.startedAt||t.mode!=='down'||t.fired)return;if(tElapsed(t)>=t.target){t.elapsed=t.target;t.startedAt=null;t.fired=true;fin.push(`${who}: "${x.name}" timer finished (${Math.round(t.target/60000)} min)`);}};
+  for(const pid in state.pharmacies){const p=state.pharmacies[pid];p.tasks.forEach(x=>{if(!x.done)chk(x,p.name);});}
+  state.things.forEach(x=>chk(x,'Random task'));
+  if(fin.length){
+    document.getElementById('alertList').innerHTML=fin.map(f=>`<div class="hist-row">${esc(f)}</div>`).join('');
+    document.getElementById('alertModalBg').classList.add('show');
+    playAlertSound();catReact('alert','Timer finished!',6000);render();return;
+  }
+  document.querySelectorAll('.tmr-t').forEach(el=>{const k=el.dataset.key.split(':'),x=tHost(k[0],k[1]);if(x&&x.timer)el.textContent=tLabel(x.timer);});
+  document.querySelectorAll('.dcd').forEach(el=>{const c=dcd(el.dataset.due);el.textContent=c.txt;el.className='dcd '+c.cls;});
+}
+setInterval(timerTick,1000);
+load();render();
+checkReminders();
+setInterval(checkReminders,30000);
+
+let audioCtx=null;
+function unlockAudio(){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+  }catch(e){}
+}
+document.addEventListener('click',unlockAudio,{once:false});
+document.addEventListener('keydown',unlockAudio,{once:false});
+function playAlertSound(){
+  try{
+    unlockAudio();
+    if(!audioCtx)return;
+    const freqs=[880,660,880,660,880,660];
+    freqs.forEach((f,i)=>{
+      const delay=i*0.28;
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='square';o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0.0001,audioCtx.currentTime+delay);
+      g.gain.exponentialRampToValueAtTime(0.35,audioCtx.currentTime+delay+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+delay+0.26);
+      o.start(audioCtx.currentTime+delay);o.stop(audioCtx.currentTime+delay+0.27);
+    });
+  }catch(e){}
+}
+function checkReminders(){
+  const now=new Date();
+  const mnlHour=parseInt(now.toLocaleString('en-US',{timeZone:'Asia/Manila',hour:'2-digit',hour12:false}));
+  const today=todayMNL();
+  const fire=[];
+  for(const pid in state.pharmacies){
+    const p=state.pharmacies[pid];
+    for(const task of p.tasks){
+      if(task.done||!task.due)continue;
+      const dd=dueDateMNL(task.due);
+      const diffDays=Math.round((new Date(dd)-new Date(today))/86400000);
+      task.remind=task.remind||{};
+      if(diffDays===3&&!task.remind.d3){fire.push(`${p.name} — "${task.name}" is due in 3 days`);task.remind.d3=true;}
+      if(diffDays===1&&!task.remind.d1){fire.push(`${p.name} — "${task.name}" is due tomorrow`);task.remind.d1=true;}
+      if(diffDays===0){
+        if(mnlHour>=0&&!task.remind.due12){fire.push(`${p.name} — "${task.name}" is due TODAY (12 AM check)`);task.remind.due12=true;}
+        if(mnlHour>=3&&!task.remind.due3){fire.push(`${p.name} — "${task.name}" is due TODAY (3 AM check)`);task.remind.due3=true;}
+      }
+    }
+  }
+  if(fire.length){
+    document.getElementById('alertList').innerHTML=fire.map(f=>`<div class="hist-row">${esc(f)}</div>`).join('');
+    document.getElementById('alertModalBg').classList.add('show');
+    playAlertSound();catReact('alert','Reminder: '+fire.length+' due soon',6000);
+    save();
+  }
+}
+</script>
+</div></body>
+</html>
